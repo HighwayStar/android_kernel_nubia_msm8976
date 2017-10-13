@@ -110,6 +110,8 @@ static void send_reset(struct sk_buff *oldskb, int hook)
 	nskb->protocol = htons(ETH_P_IP);
 	if (ip_route_me_harder(nskb, RTN_UNSPEC))
 		goto free_nskb;
+	else
+		niph = ip_hdr(nskb);
 
 	niph->ttl	= ip4_dst_hoplimit(skb_dst(nskb));
 
