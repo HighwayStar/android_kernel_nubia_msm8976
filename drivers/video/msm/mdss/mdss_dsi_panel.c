@@ -30,6 +30,11 @@
 #define MIN_REFRESH_RATE 48
 #define DEFAULT_MDP_TRANSFER_TIME 14000
 
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+#include "nubia_disp_preference.h"
+static int cabc_panel_state = 1;
+#endif
+
 DEFINE_LED_TRIGGER(bl_led_trigger);
 
 #define CEIL(x, y)	(((x) + ((y)-1)) / (y))
@@ -181,16 +186,106 @@ static void mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
 	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
 }
 
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+int nubia_mdss_dsi_panel_cmds_send(struct mdss_dsi_ctrl_pdata *ctrl,
+                       struct dsi_panel_cmds *pcmds)
+{
+       int ret = 0;
+       struct mdss_panel_info *pinfo;
+       pinfo = &(ctrl->panel_data.panel_info);
+       if(cabc_panel_state == 1){
+               mdss_dsi_panel_cmds_send(ctrl,pcmds,CMD_REQ_COMMIT);
+               ret = 0;
+               pr_debug("nubia lcd disp func");
+       }else{
+               pr_err("nubia lcd disp not ready");
+               ret = -1;
+       }
+       return ret;
+}
+#endif
+
+
+static char unlock_ofilm_cmd1[3] = {0x99, 0x95, 0x27};
+static char lock_ofilm_cmd1[3] = {0x99, 0x0, 0x0};
+
+#ifdef CONFIG_NUBIA_LCD_DIM_SWITCH
+static char dimming[2] = {0x53, 0x0};	/* DTYPE_DCS_WRITE1 */
+static struct dsi_cmd_desc dimming_cmd = {
+	{DTYPE_DCS_WRITE1, 1, 0, 0, 1, sizeof(dimming)},
+	dimming
+};
+
+static struct dsi_cmd_desc dimming_cmd_ofilm[] = {
+	{{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(unlock_ofilm_cmd1)},
+	unlock_ofilm_cmd1},
+	{{DTYPE_DCS_WRITE1, 1, 0, 0, 1, sizeof(dimming)},
+	dimming},
+	{{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(lock_ofilm_cmd1)},
+	lock_ofilm_cmd1}
+};
+
+static void mdss_dsi_panel_dimming_enable(struct mdss_dsi_ctrl_pdata *ctrl, bool enable)
+{
+	struct dcs_cmd_req cmdreq;
+	struct mdss_panel_info *pinfo;
+	pinfo = &(ctrl->panel_data.panel_info);
+	if (pinfo->dcs_cmd_by_left) {
+		if (ctrl->ndx != DSI_CTRL_LEFT) {
+			pr_err("[lcd]%s: %d: ctrl->ndx error \n", __func__, __LINE__);
+			return;
+		}
+	}
+
+	if (enable) {
+		dimming[1] = 0x2C;
+	} else {
+		dimming[1] = 0x24;
+	}
+
+	memset(&cmdreq, 0, sizeof(cmdreq));
+
+	cmdreq.cmds = &dimming_cmd;
+	cmdreq.cmds_cnt = 1;
+
+	if (!strncmp(pinfo->panel_name, "ofilm", 5)) {
+		cmdreq.cmds = dimming_cmd_ofilm;
+		cmdreq.cmds_cnt = 3;
+	}
+	cmdreq.flags = CMD_REQ_COMMIT | CMD_CLK_CTRL;
+	cmdreq.rlen = 0;
+	cmdreq.cb = NULL;
+	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
+
+	pr_debug("[lcd]%s: %d: %s dimming \n", __func__, __LINE__, enable ? "enable" : "disable");
+}
+#endif
+
 static char led_pwm1[2] = {0x51, 0x0};	/* DTYPE_DCS_WRITE1 */
 static struct dsi_cmd_desc backlight_cmd = {
 	{DTYPE_DCS_WRITE1, 1, 0, 0, 1, sizeof(led_pwm1)},
 	led_pwm1
 };
+static struct dsi_cmd_desc backlight_cmd_ofilm[] = {
+	{{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(unlock_ofilm_cmd1)},
+	unlock_ofilm_cmd1},
+	{{DTYPE_DCS_WRITE1, 1, 0, 0, 1, sizeof(led_pwm1)},
+	led_pwm1},
+	{{DTYPE_DCS_LWRITE, 1, 0, 0, 1, sizeof(lock_ofilm_cmd1)},
+	lock_ofilm_cmd1}
+};
+//ZTEMT: added by nubia camera for front camera flash  start
+extern int camera_lcd_bkl_handle(void);
+//ZTEMT: added by nubia camera for front camera flash end
 
 static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 {
 	struct dcs_cmd_req cmdreq;
 	struct mdss_panel_info *pinfo;
+	static int last_level = -1;
+#ifdef CONFIG_NUBIA_LCD_DIM_SWITCH
+	static bool bl_on = true;
+#endif
 
 	pinfo = &(ctrl->panel_data.panel_info);
 	if (pinfo->dcs_cmd_by_left) {
@@ -199,17 +294,66 @@ static void mdss_dsi_panel_bklt_dcs(struct mdss_dsi_ctrl_pdata *ctrl, int level)
 	}
 
 	pr_debug("%s: level=%d\n", __func__, level);
+	//ZTEMT: added by nubia camera for front camera flash start
+	if (camera_lcd_bkl_handle()){
+		mdss_dsi_panel_dimming_enable(ctrl, false);
+	}
+	//ZTEMT: added by nubia camera for front camera flash end
+#ifdef CONFIG_NUBIA_LCD_DIM_SWITCH
+	else {
+		if (likely(pinfo->disable_dimming_when_suspend)) {
+			if (level == 0) {
+				mdss_dsi_panel_dimming_enable(ctrl, false);
+				bl_on = false;
+			}
+		}
+
+		if (likely(pinfo->disable_dimming_when_resume)) {
+			if (!last_level) {
+				mdss_dsi_panel_dimming_enable(ctrl, false);
+			}
+			else if (level && !bl_on) {
+				usleep_range(20000, 20000);
+				mdss_dsi_panel_dimming_enable(ctrl, true);
+				bl_on = true;
+			}
+		}
+	}
+#endif
 
 	led_pwm1[1] = (unsigned char)level;
 
 	memset(&cmdreq, 0, sizeof(cmdreq));
 	cmdreq.cmds = &backlight_cmd;
 	cmdreq.cmds_cnt = 1;
+
+	if (!strncmp(pinfo->panel_name, "ofilm", 5)) {
+		if( !last_level )
+			usleep_range(20000, 20000);
+		cmdreq.cmds = backlight_cmd_ofilm;
+		cmdreq.cmds_cnt = 3;
+	}
+
 	cmdreq.flags = CMD_REQ_COMMIT | CMD_CLK_CTRL;
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
 	mdss_dsi_cmdlist_put(ctrl, &cmdreq);
+
+	//nubia for lcd backlight
+	//it's better to put this logical to function:mdss_dsi_panel_bl_ctrl
+	if( !!last_level !=  !!level )
+		pr_err("[LCD]%s: bl_level=%d\n",__func__,  level);
+
+	if (likely(pinfo->disable_dimming_when_resume)) {
+		if (!last_level) {
+			usleep_range(20000, 20000);
+			mdss_dsi_panel_dimming_enable(ctrl, true);
+		}
+	}
+
+	last_level = level;
+
 }
 
 static int mdss_dsi_request_gpios(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
@@ -635,6 +779,7 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	struct mdss_dsi_ctrl_pdata *sctrl = NULL;
 
+
 	if (pdata == NULL) {
 		pr_err("%s: Invalid input data\n", __func__);
 		return;
@@ -660,6 +805,13 @@ static void mdss_dsi_panel_bl_ctrl(struct mdss_panel_data *pdata,
 		mdss_dsi_panel_bklt_pwm(ctrl_pdata, bl_level);
 		break;
 	case BL_DCS_CMD:
+
+#ifdef CONFIG_NUBIA_LCD_WLED_AND_DCS
+	if ( !bl_level )
+		led_trigger_event(bl_led_trigger, 0);
+	else
+		led_trigger_event(bl_led_trigger, 4095);
+#endif
 		if (!mdss_dsi_sync_wait_enable(ctrl_pdata)) {
 			mdss_dsi_panel_bklt_dcs(ctrl_pdata, bl_level);
 			break;
@@ -726,7 +878,11 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 
 	if (ctrl->ds_registered)
 		mdss_dba_utils_video_on(pinfo->dba_data, pinfo);
+
 end:
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+	cabc_panel_state = 1;
+#endif
 	pr_debug("%s:-\n", __func__);
 	return ret;
 }
@@ -784,6 +940,10 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		pr_err("%s: Invalid input data\n", __func__);
 		return -EINVAL;
 	}
+
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+	cabc_panel_state = 0;
+#endif
 
 	pinfo = &pdata->panel_info;
 	ctrl = container_of(pdata, struct mdss_dsi_ctrl_pdata,
@@ -1720,6 +1880,18 @@ static int mdss_dsi_parse_panel_features(struct device_node *np,
 					__func__, __LINE__);
 	}
 
+#ifdef CONFIG_NUBIA_LCD_DIM_SWITCH
+	pinfo->disable_dimming_when_suspend =
+		of_property_read_bool(np, "qcom,disable-dimming-when-suspend");
+	pr_info("[lcd] %s: %d: disable_dimming_when_suspend is %d\n",
+		__func__, __LINE__, pinfo->disable_dimming_when_suspend);
+
+	pinfo->disable_dimming_when_resume =
+		of_property_read_bool(np, "qcom,disable-dimming-when-resume");
+	pr_info("[lcd] %s: %d: disable_dimming_when_resume is %d\n",
+		__func__, __LINE__, pinfo->disable_dimming_when_resume);
+#endif
+
 	return 0;
 }
 
@@ -1903,6 +2075,12 @@ int mdss_panel_parse_bl_settings(struct device_node *np,
 								 __func__);
 			}
 		} else if (!strcmp(data, "bl_ctrl_dcs")) {
+#ifdef CONFIG_NUBIA_LCD_WLED_AND_DCS
+			led_trigger_register_simple("bkl-trigger",
+				&bl_led_trigger);
+			pr_debug("%s: SUCCESS-> WLED TRIGGER register\n",
+				__func__);
+#endif
 			ctrl_pdata->bklt_ctrl = BL_DCS_CMD;
 			pr_debug("%s: Configured DCS_CMD bklt ctrl\n",
 								__func__);
@@ -1913,7 +2091,11 @@ int mdss_panel_parse_bl_settings(struct device_node *np,
 
 void mdss_dsi_unregister_bl_settings(struct mdss_dsi_ctrl_pdata *ctrl_pdata)
 {
+#ifdef CONFIG_NUBIA_LCD_WLED_AND_DCS
+	if (ctrl_pdata->bklt_ctrl == BL_WLED || ctrl_pdata->bklt_ctrl == BL_DCS_CMD)
+#else
 	if (ctrl_pdata->bklt_ctrl == BL_WLED)
+#endif
 		led_trigger_unregister_simple(bl_led_trigger);
 }
 
@@ -2156,6 +2338,10 @@ static int mdss_panel_parse_dt(struct device_node *np,
 	const char *data;
 	static const char *pdest;
 	struct mdss_panel_info *pinfo = &(ctrl_pdata->panel_data.panel_info);
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+       int i;
+       u32 colortmp[3];
+#endif
 
 	rc = of_property_read_u32(np,
 		"qcom,mdss-pan-physical-width-dimension", &tmp);
@@ -2346,6 +2532,178 @@ static int mdss_panel_parse_dt(struct device_node *np,
 	pinfo->mipi.force_clk_lane_hs = of_property_read_bool(np,
 		"qcom,mdss-dsi-force-clock-lane-hs");
 
+	rc = of_property_read_u32(np, "nubia,mdss-dsi-cabc-low-bl", &tmp);
+	ctrl_pdata->nubia_mdss_dsi_cabc_low_bl = (!rc ? tmp : 0);
+
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+	/* colortmp start */
+	rc = of_property_read_u32_array(np, "nubia,mdss-dsi-colortmp-warm", colortmp, 3);
+	if (rc) {
+		pr_err("%s:%d, error reading nubia,mdss-dsi-colortmp-warm, rc = %d\n",
+			__func__, __LINE__, rc);
+		ctrl_pdata->nubia_mdp_colortmp_warm.defult = 1;
+	} else {
+		ctrl_pdata->nubia_mdp_colortmp_warm.red = colortmp[0];
+		ctrl_pdata->nubia_mdp_colortmp_warm.green = colortmp[1];
+		ctrl_pdata->nubia_mdp_colortmp_warm.blue = colortmp[2];
+		ctrl_pdata->nubia_mdp_colortmp_warm.defult = 0;
+		for (i = 0; i < 3; i++)
+			pr_debug("[LCD] warm colortmp[%d]=%x",i,colortmp[i]);
+	}
+	rc = of_property_read_u32_array(np, "nubia,mdss-dsi-colortmp-natural", colortmp, 3);
+	if (rc) {
+		pr_err("%s:%d, error reading nubia,mdss-dsi-colortmp-natural, rc = %d\n",
+			__func__, __LINE__, rc);
+		ctrl_pdata->nubia_mdp_colortmp_natural.defult = 1;
+	} else {
+		ctrl_pdata->nubia_mdp_colortmp_natural.red = colortmp[0];
+		ctrl_pdata->nubia_mdp_colortmp_natural.green = colortmp[1];
+		ctrl_pdata->nubia_mdp_colortmp_natural.blue = colortmp[2];
+		ctrl_pdata->nubia_mdp_colortmp_natural.defult = 0;
+		for (i = 0; i < 3; i++)
+			pr_debug("[LCD] natural colortmp[%d]=%x",i,colortmp[i]);
+	}
+	rc = of_property_read_u32_array(np, "nubia,mdss-dsi-colortmp-cool", colortmp, 3);
+	if (rc) {
+		pr_err("%s:%d, error reading nubia,mdss-dsi-colortmp-cool, rc = %d\n",
+			__func__, __LINE__, rc);
+		ctrl_pdata->nubia_mdp_colortmp_cool.defult = 1;
+	} else {
+		ctrl_pdata->nubia_mdp_colortmp_cool.red = colortmp[0];
+		ctrl_pdata->nubia_mdp_colortmp_cool.green = colortmp[1];
+		ctrl_pdata->nubia_mdp_colortmp_cool.blue = colortmp[2];
+		ctrl_pdata->nubia_mdp_colortmp_cool.defult = 0;
+		for (i = 0; i < 3; i ++)
+			pr_debug("[LCD] cool colortmp[%d]=%x",i,colortmp[i]);
+	}
+
+	rc = of_property_read_u32(np, "nubia,colortmp-adjustable-blue", &tmp);
+		ctrl_pdata->nubia_colortmp_adjustable_blue= (!rc ? tmp : 0x3f);
+
+	rc = of_property_read_u32(np, "nubia,colortmp-adjustable-red", &tmp);
+		ctrl_pdata->nubia_colortmp_adjustable_red= (!rc ? tmp : 0x3f);
+	/* colortmp end */
+
+	/* color enhance start */
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cmds_off,
+		"nubia,mdss-dsi-ce-command-off", "nubia,mdss-dsi-ce-command-state");
+	if (ctrl_pdata->ce_cmds_off.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-ce-command-off\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cmds_soft,
+		"nubia,mdss-dsi-ce-command-soft", "nubia,mdss-dsi-ce-command-state");
+	if (ctrl_pdata->ce_cmds_soft.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-ce-command-soft\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cmds_std,
+		"nubia,mdss-dsi-ce-command-std", "nubia,mdss-dsi-ce-command-state");
+	if (ctrl_pdata->ce_cmds_soft.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-ce-command-std\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cmds_glow,
+		"nubia,mdss-dsi-ce-command-glow", "nubia,mdss-dsi-ce-command-state");
+	if(ctrl_pdata->ce_cmds_soft.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-ce-command-glow\n");
+	/* color enhance end */
+
+	/* cabc start */
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds_off,
+		"nubia,mdss-dsi-cabc-command-off", "nubia,mdss-dsi-cabc-command-state");
+	if(ctrl_pdata->cabc_cmds_off.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-cabc-command-off\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds_level1,
+		"nubia,mdss-dsi-cabc-command-level1", "nubia,mdss-dsi-cabc-command-state");
+	if(ctrl_pdata->cabc_cmds_level1.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-cabc-command-level1\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds_level2,
+		"nubia,mdss-dsi-cabc-command-level2", "nubia,mdss-dsi-cabc-command-state");
+	if(ctrl_pdata->cabc_cmds_level2.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-cabc-command-level2\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->cabc_cmds_level3,
+		"nubia,mdss-dsi-cabc-command-level3", "nubia,mdss-dsi-cabc-command-state");
+	if(ctrl_pdata->cabc_cmds_level3.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-cabc-command-level3\n");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds0,
+		"nubia,mdss-dsi-ce-cabc-command0", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds1,
+		"nubia,mdss-dsi-ce-cabc-command1", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds2,
+		"nubia,mdss-dsi-ce-cabc-command2", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds3,
+		"nubia,mdss-dsi-ce-cabc-command3", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds4,
+		"nubia,mdss-dsi-ce-cabc-command4", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds5,
+		"nubia,mdss-dsi-ce-cabc-command5", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds6,
+		"nubia,mdss-dsi-ce-cabc-command6", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds7,
+		"nubia,mdss-dsi-ce-cabc-command7", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds8,
+		"nubia,mdss-dsi-ce-cabc-command8", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds9,
+		"nubia,mdss-dsi-ce-cabc-command9", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds10,
+		"nubia,mdss-dsi-ce-cabc-command10", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds11,
+		"nubia,mdss-dsi-ce-cabc-command11", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds12,
+		"nubia,mdss-dsi-ce-cabc-command12", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds13,
+		"nubia,mdss-dsi-ce-cabc-command13", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds14,
+		"nubia,mdss-dsi-ce-cabc-command14", "nubia,mdss-dsi-ce-cabc-command-state");
+
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->ce_cabc_cmds15,
+		"nubia,mdss-dsi-ce-cabc-command15", "nubia,mdss-dsi-ce-cabc-command-state");
+	/* cabc end */
+#if defined( CONFIG_NUBIA_LCD_ALPM_MODE )
+      /* alpm mode start  */
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->alpm_cmds_on,
+		"nubia,mdss-dsi-alpm-command-on", "nubia,mdss-dsi-alpm-command-on-state");
+	if (ctrl_pdata->alpm_cmds_on.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-alpm-command-on\n");
+	mdss_dsi_parse_dcs_cmds(np, &ctrl_pdata->alpm_cmds_off,
+		"nubia,mdss-dsi-alpm-command-off", "nubia,mdss-dsi-alpm-command-off-state");
+	if (ctrl_pdata->alpm_cmds_off.cmd_cnt == 0)
+		pr_err("[LCD]Unable to read nubia,mdss-dsi-alpm-command-off\n");
+      /* alpm mode end  */
+#endif
+#endif
+
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+	data = of_get_property(np, "nubia,mdss-dsi-panel-backlight-curve", &tmp);
+	if ((!data) || (tmp != 256)) {
+		pr_err("%s:%d, Unable to read nubia backlight curve",
+		       __func__, __LINE__);
+		for (i = 0; i < 256; i++)
+			ctrl_pdata->backlight_curve[i] = i;
+	} else {
+		for (i = 0; i < tmp; i++){
+			ctrl_pdata->backlight_curve[i] = data[i];
+			pr_debug("[LCD]ctrl_pdata->backlight_curve[%d] = %d",i,ctrl_pdata->backlight_curve[i]);
+		}
+	}
+#endif
+
 	rc = mdss_dsi_parse_panel_features(np, ctrl_pdata);
 	if (rc) {
 		pr_err("%s: failed to parse panel features\n", __func__);
@@ -2433,6 +2791,10 @@ int mdss_dsi_panel_init(struct device_node *node,
 	ctrl_pdata->low_power_config = mdss_dsi_panel_low_power_config;
 	ctrl_pdata->panel_data.set_backlight = mdss_dsi_panel_bl_ctrl;
 	ctrl_pdata->switch_mode = mdss_dsi_panel_switch_mode;
+
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+	nubia_set_dsi_ctrl(ctrl_pdata);
+#endif
 
 	return 0;
 }

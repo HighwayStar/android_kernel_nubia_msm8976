@@ -482,6 +482,13 @@ int srs_trumedia_open(int port_id, int copp_idx, __s32 srs_tech_id,
 		pr_err("%s: Invalid port_id %#x\n", __func__, port_id);
 		return -EINVAL;
 	}
+        /*----begin-----added by nubia,modify the adsp crash */
+        if((atomic_read(&this_adm.copp.topology[port_idx][copp_idx]) !=
+                                SRS_TRUMEDIA_TOPOLOGY_ID)) {
+                pr_err("%s: not TruMedia topology. Do not send params to DSP. port_id %#x  copp_idx %#x\n", __func__, port_id, copp_idx);
+                return -EINVAL;
+        }
+        /*----end--------added by nubia,modify the adsp crash */
 	switch (srs_tech_id) {
 	case SRS_ID_GLOBAL: {
 		struct srs_trumedia_params_GLOBAL *glb_params = NULL;

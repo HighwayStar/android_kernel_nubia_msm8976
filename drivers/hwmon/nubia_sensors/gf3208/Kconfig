@@ -1,0 +1,8 @@
+config NUBIA_SENSORS_FP_GF3208
+	tristate "nubia sensors fp gf3208"
+	depends on NUBIA_SENSORS_FP
+	default n
+	help
+	  This is the main file for fingerprint driver for gf3208.
+	  Say Y here if you have a gf318m fingerprint connected
+	  to your system.

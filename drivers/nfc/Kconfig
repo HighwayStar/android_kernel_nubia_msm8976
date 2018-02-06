@@ -58,3 +58,12 @@ config NFC_NQ
 	  This enables the NFC driver for NQx based devices.
 	  This is for i2c connected version. NCI protocol logic
 	  resides in the usermode and it has no other NFC dependencies.
+config BCM2079X_I2C
+	tristate "BCM2079X NFC driver"
+	depends on I2C
+	default n
+	help
+	  Say yes if you want BCM20791 Near Field Communication driver.
+	  This is for i2c connected version. If unsure, say N here.
+	  To compile this driver as a module, choose m here. The module will
+	  be called bcm2079x.

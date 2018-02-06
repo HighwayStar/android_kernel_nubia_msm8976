@@ -153,3 +153,8 @@ config HIGH_RES_TIMERS
 
 endmenu
 endif
+config NUBIA_POWER_OFF_CHARGE_MODE_ALARM
+	bool "Power off charge mode alarm reboot support"
+	help
+	  This option enable power-off alarm suppport in power-off charge mode,
+	  kernel will reboot with command rtc when power-off alarm triggered.

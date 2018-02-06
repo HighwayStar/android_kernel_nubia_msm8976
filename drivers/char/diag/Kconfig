@@ -20,6 +20,13 @@ config DIAG_OVER_USB
 	default y
 	help
 	 This feature helps segregate code required for DIAG traffic to go over USB.
+
+config NUBIA_DIAG_REBOOT_CMD
+        bool "Enable DIAG handle reboot cmd"
+       depends on ARCH_MSM
+        default y
+        help
+         This feature helps reboot cmd by diag.
 endmenu
 
 menu "HSIC/SMUX support for DIAG"
