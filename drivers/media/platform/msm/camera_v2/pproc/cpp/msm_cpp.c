@@ -2246,7 +2246,7 @@ static int msm_cpp_cfg_frame(struct cpp_device *cpp_dev,
 	struct msm_buf_mngr_info buff_mgr_info, dup_buff_mgr_info;
 	int32_t in_fd;
 	int32_t num_output_bufs = 1;
-	uint32_t stripe_base = 0;
+	int32_t stripe_base = 0;
 	uint32_t stripe_size;
 	uint8_t tnr_enabled;
 	enum msm_camera_buf_mngr_buf_type buf_type =

@@ -9,7 +9,9 @@ ccflags-y += -Idrivers/media/platform/msm/camera_v2/jpeg_10
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/jpeg_dma
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/fd
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/common
-
+#ZTEMT:congshan add for AL3200--------Start
+ccflags-y += -Idrivers/media/platform/msm/camera_v2/al3200
+#ZTEMT:congshan add for AL3200--------end
 obj-$(CONFIG_MSMB_CAMERA) += common/
 obj-$(CONFIG_MSMB_CAMERA) += msm.o
 obj-$(CONFIG_MSMB_CAMERA) += camera/
@@ -22,3 +24,6 @@ obj-$(CONFIG_MSMB_JPEG) += jpeg_10/
 obj-$(CONFIG_MSM_JPEGDMA) += jpeg_dma/
 obj-$(CONFIG_MSMB_CAMERA) += msm_buf_mgr/
 obj-$(CONFIG_MSM_FD) += fd/
+#ZTEMT:congshan add for AL3200--------Start
+obj-$(CONFIG_AL3200) += al3200/
+#ZTEMT:congshan add for AL3200--------end
