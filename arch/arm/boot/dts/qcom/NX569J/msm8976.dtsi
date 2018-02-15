@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-#include "skeleton64.dtsi"
+#include "../skeleton64.dtsi"
 #include <dt-bindings/clock/msm-clocks-8976.h>
 #include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
 
@@ -62,7 +62,7 @@
 			linux,reserve-contiguous-region;
 			linux,reserve-region;
 			linux,remove-completely;
-			reg = <0x0 0x85b00000 0x0 0x0d00000>;
+			reg = <0x0 0x84a00000 0x0 0x1e00000>;
 			label = "other_ext_mem";
 		};
 
@@ -112,7 +112,7 @@
 		cont_splash_mem: splash_region@83000000 {
 			linux,reserve-contiguous-region;
 			linux,reserve-region;
-			reg = <0x0 0x83000000 0x0 0x2800000>;
+			reg = <0x0 0x8de00000 0x0 0x2800000>;
 			label = "cont_splash_mem";
 		};
 
@@ -122,23 +122,31 @@
 			reg = <0x0 0x0 0x0 0x400000>;
 			label = "adsp_mem";
 		};
+
+		pstore_reserve_mem: pstore_reserve_mem_region@0 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			reg = <0x0 0x9ff00000 0x0 0x00100000>;
+			label = "pstore_reserve_mem";
+		};
 	};
 };
 
 #include "msm8976-pinctrl.dtsi"
-#include "msm8976-ion.dtsi"
-#include "msm8976-iommu.dtsi"
+#include "../msm8976-ion.dtsi"
+#include "../msm8976-iommu.dtsi"
 #include "msm8976-mdss.dtsi"
-#include "msm8976-iommu-domains.dtsi"
-#include "msm8976-smp2p.dtsi"
-#include "msm8976-bus.dtsi"
-#include "msm8976-jtag.dtsi"
-#include "msm8976-coresight.dtsi"
-#include "msm8976-pm.dtsi"
-#include "msm8976-gpu.dtsi"
-#include "msm8976-mdss-pll.dtsi"
-#include "msm8976-cpu.dtsi"
-#include "msm-rdbg.dtsi"
+#include "../msm8976-iommu-domains.dtsi"
+#include "../msm8976-smp2p.dtsi"
+#include "../msm8976-bus.dtsi"
+#include "../msm8976-jtag.dtsi"
+#include "../msm8976-coresight.dtsi"
+#include "../msm8976-pm.dtsi"
+#include "../msm8976-gpu.dtsi"
+#include "../msm8976-mdss-pll.dtsi"
+#include "../msm8976-cpu.dtsi"
+#include "../msm-rdbg.dtsi"
 
 &soc {
 	#address-cells = <1>;
@@ -871,7 +879,7 @@
 			qcom,mitigation-freq-khz = <1382400>;
 			qcom,vph-high-threshold-uv = <3500000>;
 			qcom,vph-low-threshold-uv = <3200000>;
-			qcom,soc-low-threshold = <10>;
+			qcom,soc-low-threshold = <5>;
 			qcom,thermal-handle = <&msm_thermal_freq>;
 		};
 	};
@@ -1092,8 +1100,8 @@
 		clocks = <&clock_gcc clk_gcc_blsp1_uart2_apps_clk>,
 		       <&clock_gcc clk_gcc_blsp1_ahb_clk>;
 	};
-
-	blsp1_uart0: uart@78af000 {
+//ZTEMT: comment by congshan start
+	/*blsp1_uart0: uart@78af000 {
 		compatible = "qcom,msm-hsuart-v14";
 		reg = <0x78af000 0x200>,
 			<0x7884000 0x1f000>;
@@ -1128,8 +1136,8 @@
 					<86 512 0 0>,
 					<86 512 500 800>;
 		status = "disabled";
-	};
-
+	};*/
+//ZTEMT: comment by congshan end
 	dma_blsp1: qcom,sps-dma@7884000 { /* BLSP1 */
                 #dma-cells = <4>;
                 compatible = "qcom,sps-dma";
@@ -1210,8 +1218,8 @@
 		pinctrl-names = "i2c_active", "i2c_sleep";
 		pinctrl-0 = <&i2c_6_active>;
 		pinctrl-1 = <&i2c_6_sleep>;
-		qcom,noise-rjct-scl = <0>;
-		qcom,noise-rjct-sda = <0>;
+		qcom,noise-rjct-scl = <3>;
+		qcom,noise-rjct-sda = <3>;
 		qcom,master-id = <84>;
 		dmas = <&dma_blsp2 6 64 0x20000020 0x20>,
 			<&dma_blsp2 7 32 0x20000020 0x20>;
@@ -1277,6 +1285,9 @@
 				<87 512 0 0>,
 				<87 512 60000 0>,
 				<87 512 6000  6000>;
+        
+		//CONFIG_ZTEMT_COMMON_CHARGER add vbus detect
+		qcom,usbin-vadc = <&pmi8950_vadc>;
 
 		clocks = <&clock_gcc clk_gcc_usb_hs_ahb_clk>,
 			 <&clock_gcc clk_gcc_usb_hs_system_clk>,
@@ -1302,6 +1313,7 @@
 		compatible = "qcom,android-usb";
 		reg = <0x086000c8 0xc8>;
 		qcom,pm-qos-latency = <59 150 10741>;
+		qcom,android-usb-cdrom;
 	};
 
 	slim_msm: slim@c140000{
@@ -1504,8 +1516,8 @@
 		reg = <0xb017000 0x1000>;
 		reg-names = "wdt-base";
 		interrupts = <0 3 0>, <0 4 0>;
-		qcom,bark-time = <11000>;
-		qcom,pet-time = <10000>;
+		qcom,bark-time = <20000>;
+		qcom,pet-time = <15000>;
 		qcom,ipi-ping;
 	};
 
@@ -1613,9 +1625,9 @@
 		qcom,ce-opp-freq = <100000000>;
 	};
 
-	qcom_seecom: qseecom@85b00000 {
+	qcom_seecom: qseecom@84a00000 {
 		compatible = "qcom,qseecom";
-		reg = <0x85b00000 0x800000>;
+		reg = <0x84a00000 0x1900000>;
 		reg-names = "secapp-region";
 		qcom,hlos-num-ce-hw-instances = <1>;
 		qcom,hlos-ce-hw-instance = <0>;
@@ -1629,9 +1641,9 @@
 		qcom,support-bus-scaling;
 		qcom,msm-bus,vectors-KBps =
 			<55 512 0 0>,
-			<55 512 200000 400000>,
-			<55 512 300000 800000>,
-			<55 512 400000 1000000>;
+			<55 512 0 0>,
+			<55 512 120000 1200000>,
+			<55 512 393600 3936000>;
 		clocks = <&clock_gcc clk_crypto_clk_src>,
 			 <&clock_gcc clk_gcc_crypto_clk>,
 			 <&clock_gcc clk_gcc_crypto_ahb_clk>,
@@ -2122,13 +2134,14 @@
 	};
 
 	spi_0: spi@0x78B5000 { /* BLSP1 QUP0 */
+
 		compatible = "qcom,spi-qup-v2";
 		reg-names = "spi_physical", "spi_bam_physical";
 		reg = <0x78B5000 0x600>,
 		      <0x7884000 0x1f000>;
 		interrupt-names = "spi_irq", "spi_bam_irq";
 		interrupts = <0 95 0>, <0 238 0>;
-		spi-max-frequency = <19200000>;
+		spi-max-frequency = <50000000>; //ZTEMT: changed from 19200000 to 50000000
 		pinctrl-names = "spi_default", "spi_sleep";
 		pinctrl-0 = <&spi0_default &spi0_cs0_active>;
 		pinctrl-1 = <&spi0_sleep &spi0_cs0_sleep>;
@@ -2142,6 +2155,8 @@
 		qcom,bam-consumer-pipe-index = <4>;
 		qcom,bam-producer-pipe-index = <5>;
 		qcom,master-id = <86>;
+		status = "ok";//ZTEMT:change by congshan 
+
 	};
 
 	qcom,msm-ssc-sensors {
@@ -2373,7 +2388,8 @@
 		pinctrl-0 = <&cdc_reset_line_act>;
 		pinctrl-1 = <&cdc_reset_line_sus>;
 	};
-
+//ZTEMT: comment by congshan start
+/*
 	clock_audio: audio_ext_clk {
 		compatible = "qcom,audio-ref-clk";
 		qcom,audio-ref-clk-gpio = <&pm8950_gpios 1 0>;
@@ -2382,6 +2398,8 @@
 		qcom,node_has_rpm_clock;
 		#clock-cells = <1>;
 	};
+*/
+//ZTEMT: comment by congshan end
 
 	pcm0: qcom,msm-pcm {
 		compatible = "qcom,msm-pcm-dsp";
@@ -2752,13 +2770,13 @@
 	};
 };
 
-#include "msm-pm8950-rpm-regulator.dtsi"
+#include "../msm-pm8950-rpm-regulator.dtsi"
 #include "msm-pm8950.dtsi"
 #include "msm-pmi8950.dtsi"
 #include "msm-pm8004.dtsi"
 #include "msm8976-regulator.dtsi"
-#include "msm-gdsc-8916.dtsi"
-#include "msm8976-camera.dtsi"
+#include "../msm-gdsc-8916.dtsi"
+#include "../msm8976-camera.dtsi"
 
 &gdsc_venus {
 	clock-names = "bus_clk", "core_clk";
@@ -2838,8 +2856,9 @@
 		compatible = "qcom,msm-dai-slim";
 		elemental-addr = [ff ff ff fe 17 02];
 	};
+//ZTEMT:comment by congshan start
 
-	tasha_codec {
+	/*tasha_codec {
 		compatible = "qcom,tasha-slim-pgd";
 		elemental-addr = [00 01 A0 01 17 02];
 
@@ -2888,7 +2907,9 @@
 		clock-names = "wcd_clk";
 		clocks = <&clock_audio clk_audio_pmi_clk>;
 		qcom,wcd-rst-gpio-node = <&wcd_rst_gpio>;
-	};
+	};*/
+	//ZTEMT:comment by congshan end
+
 };
 
 &pm8950_gpios {
