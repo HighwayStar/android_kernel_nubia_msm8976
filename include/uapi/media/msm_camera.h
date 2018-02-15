@@ -1809,6 +1809,9 @@ struct msm_actuator_cfg_data {
 		struct msm_actuator_set_info_t set_info;
 		struct msm_actuator_get_info_t get_info;
 		enum af_camera_name cam_name;
+		// ZTEMT: fuyipeng add for manual AF -----start
+               char act_name[32];
+               // ZTEMT: fuyipeng add for manual AF -----end
 	} cfg;
 };
 

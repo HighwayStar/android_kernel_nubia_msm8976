@@ -62,7 +62,10 @@
 #define FALSE  0
 
 #define MAX_LANE_COUNT 4
-#define CSID_TIMEOUT msecs_to_jiffies(100)
+/*ZTEMT modified by houyujun for csid reset--start */
+//#define CSID_TIMEOUT msecs_to_jiffies(100)
+#define CSID_TIMEOUT msecs_to_jiffies(1000)
+/*ZTEMT modified by houyujun for csid reset--End */
 
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)

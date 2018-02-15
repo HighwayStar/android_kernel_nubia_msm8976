@@ -1112,13 +1112,14 @@ static int32_t msm_actuator_power_down(struct msm_actuator_ctrl_t *a_ctrl)
 
 	CDBG("Enter\n");
 	if (a_ctrl->actuator_state != ACT_DISABLE_STATE) {
-
-		if (a_ctrl->func_tbl && a_ctrl->func_tbl->actuator_park_lens) {
+/*ZTEMT modified by houyujun for aux sensor not park lens--start*/
+	if ((a_ctrl->func_tbl && a_ctrl->func_tbl->actuator_park_lens)&&(strcmp(a_ctrl->act_name, "bu64297_aux"))) {
 			rc = a_ctrl->func_tbl->actuator_park_lens(a_ctrl);
 			if (rc < 0)
 				pr_err("%s:%d Lens park failed.\n",
 					__func__, __LINE__);
 		}
+/*ZTEMT modified by houyujun for aux sensor not park lens--start*/
 
 		rc = msm_actuator_vreg_control(a_ctrl, 0);
 		if (rc < 0) {
@@ -1490,6 +1491,16 @@ static int32_t msm_actuator_config(struct msm_actuator_ctrl_t *a_ctrl,
 		if (rc < 0)
 			pr_err("msm_actuator_power_down failed %d\n", rc);
 		break;
+	// ZTEMT: fuyipeng add for manual AF -----start
+	case CFG_SET_ACTUATOR_NAME:
+		  if (NULL != cdata->cfg.act_name)
+		  {
+			  memcpy(a_ctrl->act_name,cdata->cfg.act_name,sizeof(a_ctrl->act_name));
+			  pr_err("CFG_SET_ACTUATOR_NAME ---act_name:%s \n", a_ctrl->act_name);
+		  }
+			
+		  break;
+	// ZTEMT: fuyipeng add for manual AF -----end
 
 	case CFG_SET_POSITION:
 		if (a_ctrl->func_tbl &&
@@ -1705,6 +1716,15 @@ static long msm_actuator_subdev_do_ioctl(
 
 			parg = &actuator_data;
 			break;
+	// ZTEMT: fengxun add for manual AF -----start
+            case  CFG_SET_ACTUATOR_NAME:
+                actuator_data.cfgtype = u32->cfgtype;
+                memcpy(actuator_data.cfg.act_name,u32->cfg.act_name,sizeof(u32->cfg.act_name));
+        	pr_err("CFG_SET_ACTUATOR_NAME ---act_name:%s \n", actuator_data.cfg.act_name);
+
+		parg = &actuator_data;                
+                break;
+            // ZTEMT: fengxun add for manual AF -----end
 		case CFG_SET_DEFAULT_FOCUS:
 		case CFG_MOVE_FOCUS:
 			actuator_data.cfgtype = u32->cfgtype;
@@ -1973,7 +1993,7 @@ static int32_t msm_actuator_platform_probe(struct platform_device *pdev)
 	}
 	rc = msm_sensor_driver_get_gpio_data(&(msm_actuator_t->gconf),
 		(&pdev->dev)->of_node);
-	if (rc < 0) {
+	if (rc <= 0) {//ZTEMT: changed by congshan from rc < 0 to rc <= 0
 		pr_err("%s: No/Error Actuator GPIOs\n", __func__);
 	} else {
 		msm_actuator_t->cam_pinctrl_status = 1;

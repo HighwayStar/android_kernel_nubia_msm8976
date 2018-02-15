@@ -27,6 +27,9 @@
 
 #define	MSM_ACTUATOR_MAX_VREGS (10)
 #define	ACTUATOR_MAX_POLL_COUNT 10
+//ZTEMT: li.bin223 20150421 add for avoid kernel crash ----start
+#define	MSM_ACTUATOT_MAX_NAME (32)
+//ZTEMT: li.bin223 20150421 add for avoid kernel crash ----end
 
 struct msm_actuator_ctrl_t;
 
@@ -108,6 +111,9 @@ struct msm_actuator_ctrl_t {
 	struct msm_camera_gpio_conf *gconf;
 	struct msm_pinctrl_info pinctrl_info;
 	uint8_t cam_pinctrl_status;
+	// ZTEMT: fuyipeng add for manual AF -----start
+	char act_name[MSM_ACTUATOT_MAX_NAME];
+	// ZTEMT: fuyipeng add for manual AF -----end	
 };
 
 #endif
