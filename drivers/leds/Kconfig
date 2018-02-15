@@ -32,6 +32,15 @@ config LEDS_88PM860X
 	  This option enables support for on-chip LED drivers found on Marvell
 	  Semiconductor 88PM8606 PMIC.
 
+
+config  LEDS_NUBIA_AW2013
+	tristate "LED Support for nubia AW2013 led"
+	depends on LEDS_CLASS
+	help
+	  This option enables support for on-chip LED drivers found on Marvell
+	  Semiconductor 88PM8606 PMIC.
+
+
 config LEDS_ATMEL_PWM
 	tristate "LED Support using Atmel PWM outputs"
 	depends on LEDS_CLASS
