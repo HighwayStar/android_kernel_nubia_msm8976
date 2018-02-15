@@ -1,0 +1,68 @@
+/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+//zte_nx508j_2850mah_averaged_masterslave_dec10th2014
+
+qcom,ztemt-batterydata  {
+	qcom,fcc-mah = <3000>;
+	qcom,nom-batt-capacity-mah = <3000>;
+	qcom,default-rbatt-mohm = <128>;
+	qcom,max-voltage-uv = <4400000>;
+	qcom,rbatt-capacitive-mohm = <50>;
+	qcom,v-cutoff-uv = <3400000>;
+	qcom,chg-term-ua = <100000>;
+	qcom,batt-id-kohm = <470>;
+	qcom,battery-beta = <3800>;
+	qcom,chg-rslow-comp-c1 = <3948202>;
+	qcom,chg-rslow-comp-c2 = <7574293>;
+	qcom,chg-rs-to-rslow = <1245123>;
+	qcom,chg-rslow-comp-thr = <0xBD>;
+	qcom,checksum = <0x57BB>;
+	qcom,gui-version = "PMI8950GUI - 2.0.0.16";
+	qcom,battery-type = "ztemt_lg_3000mah";
+
+	qcom,fg-profile-data = [
+		 F9 83 B9 7D 
+		 C0 81 48 7C 
+		 5B 83 B2 65 
+		 A8 82 67 8D 
+		 1A 82 66 9A 
+		 87 BD 83 CA 
+		 5C 0E F3 83 
+		 17 7D 38 81 
+		 72 77 58 83 
+		 3D 68 00 80 
+		 CC 8C 54 82 
+		 C4 99 37 BD 
+		 5C CA 54 0E  
+		 06 0C D0 59
+		 14 70 71 FD 
+		 E4 3D D2 44 
+		 77 39 00 00 
+		 08 3D 69 39 
+		 FD 46 00 00 
+		 00 00 00 00 
+		 00 00 00 00 
+		 0A 71 15 70 
+		 FC 40 91 88 
+		 D8 75 36 69 
+		 44 67 08 7A 
+		 0D 74 60 61 
+		 11 74 36 A9 
+		 18 F7 61 D6
+		 65 A0 71 0C 
+		 28 00 FF 36 
+		 F0 11 30 03 
+		 00 00 00 0C 
+	];
+};
+
