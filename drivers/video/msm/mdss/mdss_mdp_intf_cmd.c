@@ -772,6 +772,12 @@ static int mdss_mdp_cmd_wait4pingpong(struct mdss_mdp_ctl *ctl, void *arg)
 				MDSS_MDP_REG_INTR_STATUS);
 		if (status) {
 			WARN(1, "pp done but irq not triggered\n");
+#ifdef CONFIG_NUBIA_LCD_PATCH_FOR_DEBUG
+//nubia add for temprory debug, should close when problem resolved
+			MDSS_XLOG_TOUT_HANDLER("mdp", "dsi0", "dsi1",
+				"edp", "hdmi", "panic");
+			BUG();
+#endif
 			mdss_mdp_irq_clear(ctl->mdata,
 					MDSS_MDP_IRQ_PING_PONG_COMP,
 					ctx->pp_num);

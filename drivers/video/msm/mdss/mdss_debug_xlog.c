@@ -616,6 +616,11 @@ int mdss_create_xlog_debug(struct mdss_debug_data *mdd)
 
 	mdss_dbg_xlog.xlog_enable = XLOG_DEFAULT_ENABLE;
 	mdss_dbg_xlog.panic_on_err = XLOG_DEFAULT_PANIC;
+#ifdef CONFIG_NUBIA_LCD_PATCH_FOR_DEBUG
+//nubia add for temprory debug, should close when problem resolved
+	mdss_dbg_xlog.xlog_enable = 1;
+	mdss_dbg_xlog.panic_on_err = 1;
+#endif
 	mdss_dbg_xlog.enable_reg_dump = XLOG_DEFAULT_REGDUMP;
 	mdss_dbg_xlog.enable_dbgbus_dump = XLOG_DEFAULT_DBGBUSDUMP;
 

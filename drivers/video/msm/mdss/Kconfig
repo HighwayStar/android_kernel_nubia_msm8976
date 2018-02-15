@@ -62,3 +62,43 @@ config FB_MSM_MDSS_XLOG_DEBUG
 	features to: Dump MDSS registers during driver errors, panic
 	driver during fatal errors and enable some display-driver logging
 	into an internal buffer (this avoids logging overhead).
+
+config NUBIA_LCD_DISP_PREFERENCE
+	bool "nubia lcd disp preference includes color enhancement and temperature"
+	default n
+
+config NUBIA_LCD_COLORTMP_CONTINUOUS
+	depends on NUBIA_LCD_DISP_PREFERENCE
+	bool "enable contiuous setting"
+	default n
+	---help---
+	nubia lcd disp colortemperature contiluous
+
+config NUBIA_LCD_BACKLIGHT_CURVE
+	bool "nubia lcd backlight correct curve for brightness"
+	default n
+
+config NUBIA_LCD_DIM_SWITCH
+	bool "lcd lcd dimming mode switch when suspend or resume"
+	default n
+	---help---
+	BOE LCD and TP seq modifications.
+config NUBIA_JDI_S6D1FA4X01_1080P_5P2
+	bool "lcd jdi s6d1fa4x01 1080p 5p2"
+	default n
+	---help---
+	JDI LCD and TP seq modifications.
+config NUBIA_LCD_KEEP_POWER_ON
+	bool "lcd keep power on at suspend"
+	default n
+	---help---
+	JDI LCD and TP seq modifications.
+
+config NUBIA_LCD_WLED_AND_DCS
+       bool "nubia lcd backlight dcs depend on wled"
+       default n
+       ---help---
+       Open CABC, use dcs to tune lcd backlight.
+config NUBIA_LCD_PATCH_FOR_DEBUG
+	bool "nubia lcd disp preference includes color enhancement and temperature"
+	default n
