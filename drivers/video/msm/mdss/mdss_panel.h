@@ -580,6 +580,13 @@ struct mdss_panel_info {
 	void *cec_data;
 
 	char panel_name[MDSS_MAX_PANEL_LEN];
+
+#ifdef CONFIG_NUBIA_LCD_DIM_SWITCH
+	/*dimming*/
+	bool disable_dimming_when_suspend;
+	bool disable_dimming_when_resume;
+#endif
+
 	struct mdss_mdp_pp_tear_check te;
 
 	struct dsc_desc dsc;

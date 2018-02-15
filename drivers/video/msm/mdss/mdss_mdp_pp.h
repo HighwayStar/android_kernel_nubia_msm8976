@@ -50,4 +50,8 @@ void pp_print_calib_config_buffer(struct mdp_calib_config_buffer *data,
 void pp_print_calib_dcm_state(struct mdp_calib_dcm_state *data, int tab_depth);
 void pp_print_mdss_calib_cfg(struct mdss_calib_cfg *data, int tab_depth);
 
+#ifdef CONFIG_NUBIA_LCD_DISP_PREFERENCE
+int nubia_mdss_pcc_config(struct mdp_pcc_cfg_data *config);
+#endif
+
 #endif
