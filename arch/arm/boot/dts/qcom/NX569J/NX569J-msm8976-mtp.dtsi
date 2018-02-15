@@ -1,0 +1,331 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "msm8976-mtp-usb-typec.dtsi"
+
+
+&i2c_4 { /* BLSP1 QUP4 */
+	synaptics@20 {
+		status = "disabled"; /* nubia diable default touchpad */
+	};
+
+	synaptics_dsx@20 {
+		compatible = "synaptics,dsx-i2c";
+		reg = <0x20>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <65 0x2008>;
+		//vdd_ana-supply = <&pm8953_l10>;
+		vcc_i2c-supply = <&pm8950_l22>;
+		//synaptics,pwr-reg-name = "vdd_ana";
+		synaptics,bus-reg-name = "vcc_i2c";
+		synaptics,irq-gpio = <&msm_gpio 65 0x2008>;
+		synaptics,irq-on-state = <0>;
+		synaptics,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		synaptics,power-delay-ms = <20>;
+		synaptics,power-gpio = <&msm_gpio 69 0x0>;
+		synaptics,power-on-state = <1>;
+		synaptics,reset-gpio = <&msm_gpio 64 0x0>;
+		synaptics,reset-on-state = <0>;
+		synaptics,reset-active-ms = <20>;
+		synaptics,reset-delay-ms = <20>;
+		synaptics,lcd-reset-gpio = <&msm_gpio 25 0x0>;
+		synaptics,cap-button-codes = <139 172 158>;
+		pinctrl-names = "synaptics_pin_active", "synaptics_pin_suspend";
+		pinctrl-0 = <&synaptics_int_active &synaptics_reset_active &synaptics_power_active>;
+		pinctrl-1 = <&synaptics_int_suspend &synaptics_reset_suspend &synaptics_power_suspend>;
+	};
+};
+
+&i2c_6 { /* BLSP2 QUP2 */
+	/delete-node/ nq@2b;
+
+	ams@39 {
+		compatible = "tmd2725";
+		reg = <0x39>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <140 0x2>;
+		vdd-supply = <&pm8950_l10>;
+		vio-supply = <&pm8950_l6>;
+		tmd,irq-gpio = <&msm_gpio 140 0x2002>;
+		pinctrl-names = "tmd2725_default","tmd2725_sleep";
+		pinctrl-0 = <&tmd2725_default>;
+		pinctrl-1 = <&tmd2725_sleep>;
+		tmd,power_always_on = <1>;
+		tmd,has_als = <1>;
+		tmd,has_ps = <1>;
+		tmd,tp_moudle_count = <3>;
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp0 = "0","0","438","1000","198","805","96";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp1 = "1","1","615","932","260","800","270";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp2 = "2","0","615","1000","260","800","270";
+	};
+	avago@53 {
+		compatible = "avago,apds9922";
+		reg = <0x53>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <140 0x2>;
+		vdd-ctrl-independce = <0>;
+		vdd-supply = <&pm8950_l10>;
+		vio-supply = <&pm8950_l5>;
+		avago,irq-gpio = <&msm_gpio 140 0x2002>;
+		avago,ps_threshold_low = <38>;
+		avago,ps_threshold_high = <50>;
+		avago,ps_offset = <60>;
+		avago,ps-pulse = <16>;
+		avago,als-lux-factor = <550>;
+		avago,vdd-always-on = <1>;
+		pinctrl-names = "apds9922_default","apds9922_sleep";
+		pinctrl-0 = <&apds9922_default>;
+		pinctrl-1 = <&apds9922_sleep>;
+	};
+	aw2013_led@45 {
+		aw2013_led,name = "aw2013";
+		compatible = "aw2013";
+		vdd_ana-supply = <&pm8950_l10>; 
+		vcc_i2c-supply = <&pm8950_l5>;
+		/*For adjust the brightness range,
+		 values range form 1 to 5.
+		 */
+		middle_grade_percentage = <200>;
+		side_grade_percentage = <200>;
+		grade_scale-offset = <130>;
+		blink_max_grade = <255>;
+		onceblink_fade_time = <1>;
+		onceblink_fullon_time= <0>;
+		onceblink_fulloff_time= <0>;
+		autoblink_fade_time= <4>;
+		autoblink_fullon_time= <0>;
+		autoblink_fulloff_time= <2>;
+		max_current = <0x02>;
+		side_max_current = <0x03>;
+		side_const_value = <0>;
+		reg = <0x45>;
+	};
+	/* add by liuyunli for nfc-bcm20797 */
+	broadcom_bcm2079x_nfc@77{
+		compatible = "broadcom,bcm2079x_nfc";
+		reg = <0x77>;
+		broadcom,irq-gpio = <&msm_gpio 13 0x00>;
+		broadcom,en-gpio = <&msm_gpio 12 0x00>;
+		broadcom,wake-gpio = <&msm_gpio 34 0x00>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <13 0>;
+		interrupt-names = "BRCM_NFC_INT";
+		pinctrl-names = "bcm2079x_pin_active","bcm2079x_pin_suspend";
+		pinctrl-0 = <&bcm2079x_int_active &bcm2079x_en_active &bcm2079x_ctl_active>;
+		pinctrl-1 = <&bcm2079x_int_suspend &bcm2079x_en_suspend &bcm2079x_ctl_suspend>;
+		broadcom,clk-gpio = <&pm8950_gpios 5 0x00>;
+		clocks = <&clock_gcc clk_bb_clk2_pin>;
+		clock-names = "ref_clk";
+	};
+};
+
+&i2c_2 {
+	/* Parallel-charger configuration */
+	//disable smb1351, ztemt charger
+	/delete-node/ smb1351-charger@1d;
+};
+//ZTEMT: congshan added for AL3200 ---start
+&spi_0 { 
+	mini_isp@0 {
+		compatible = "altek,mini_isp";
+		reg = <0>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <142 0x00>;
+		qcom,qup-id = <1>;
+		spi-max-frequency = <50000000>;
+		pinctrl-name = "pmx_ts_active","pmx_ts_suspend";
+		pinctrl-0 = <&al3200_gpio_int_active &al3200_gpio_active>;
+		pinctrl-1 = <&al3200_gpio_int_sleep &al3200_gpio_sleep>;
+		clocks = <&clock_gcc clk_div_clk2>;
+		clock-names = "al3200_clk";
+		qcom,clock-rates = <19200000>;
+		reset-gpios = <&msm_gpio 67 0x00>;
+		irq-gpios = <&msm_gpio 142  0x00>;
+		vcc1-gpios = <&msm_gpio 20 0x00>;//mipi_vcc0v9
+		vcc2-gpios = <&msm_gpio 21 0x00>;//vcc0v9
+		vcc1v8-gpios = <&msm_gpio 31 0x00>;
+		status = "ok";
+	};
+};
+//ZTEMT: congshan added for AL3200 ---end
+&soc {
+	/* used for fingerprint device as platform device added by nubia */
+	gf318m {
+		status = "ok";
+		compatible = "goodix,fingerprint";
+		input-device-name = "gf3208";
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <33 0>;
+		goodix,gpio_rst  = <&msm_gpio 51 0x00>;
+		goodix,gpio_int = <&msm_gpio 33 0x00>;
+		goodix,gpio_pwr = <&msm_gpio 112 0x00>;
+
+		pinctrl-names = "goodixfp_reset_reset", "goodixfp_reset_active", "goodixfp_irq_active";
+		pinctrl-0 = <&gf_rst_suspend>;
+		pinctrl-1 = <&gf_rst_active>;
+		pinctrl-2 = <&gf_int_active>;
+
+		/*clock-names = "iface_clk", "core_clk";
+		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
+			<&clock_gcc clk_gcc_blsp2_qup3_spi_apps_clk>;*/
+	};
+	gpio_keys {
+
+		camera_focus {
+			/delete-property/ gpios;
+		};
+
+		camera_snapshot {
+			/delete-property/ gpios;
+		};
+	};
+	hall_device_out {
+		compatible = "nubia,hall_device";
+		status = "okay";
+		pinctrl-names = "hall_int_0_default","hall_int_0_sleep";
+		pinctrl-0 = <&hall_int_0_default>;
+		pinctrl-1 = <&hall_int_0_sleep>;
+		vio-supply = <&pm8950_l5>;
+		interrupt-parent = <&msm_gpio>;
+		hall_device,hw_device_count = <1>;
+		hall_device,irq-gpio-0 = <&msm_gpio 144 0x2002>;
+	};
+};
+
+&sdhc_2 {
+	cd-gpios = <&msm_gpio 100 0x0>;
+};
+
+
+/{
+	mtp_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "../batterydata-itech-3000mah-4200mv.dtsi"
+		#include "../batterydata-itech-3000mah.dtsi"
+		//CONFIG_ZTEMT_COMMON_CHARGER add 
+		#include "batterydata-ztemt-4v4-3000mah.dtsi"
+		#include "batterydata-ztemt-4v4-2950mah.dtsi"
+		//ZTEMT end
+	};
+};
+
+
+&ext_codec {
+	status = "disabled";
+};
+&ext_codec {
+	status = "disabled";
+};
+
+&soc {
+	sound {
+		compatible = "qcom,msm8952-audio-codec";
+		qcom,model = "msm8952-snd-card-mtp";
+		reg = <0xc051000 0x4>,
+		    <0xc051004 0x4>,
+		    <0xc055000 0x4>,
+		    <0xc052000 0x4>;
+		reg-names = "csr_gp_io_mux_mic_ctl",
+			"csr_gp_io_mux_spkr_ctl",
+			"csr_gp_io_lpaif_pri_pcm_pri_mode_muxsel",
+			"csr_gp_io_mux_quin_ctl";
+                /* AW87xx enable gpio */
+                qcom,cdc-ext-amp-gpios = <&msm_gpio 126 0>;
+                /* AW87xx type distinguish gpio */
+                nubia,aw_pa_type_gpio = <&msm_gpio 114 0>;
+                /* box distinguish gpio */
+                nubia,box_info_gpio = <&msm_gpio 115 0>;
+
+		qcom,msm-ext-pa = "primary";
+		qcom,msm-mclk-freq = <9600000>;
+		qcom,msm-mbhc-hphl-swh = <1>;
+		qcom,msm-mbhc-gnd-swh = <1>;
+		qcom,msm-hs-micbias-type = "internal";
+		qcom,msm-micbias1-ext-cap;
+		qcom,audio-routing =
+			"RX_BIAS", "MCLK",
+			"SPK_RX_BIAS", "MCLK",
+			"INT_LDO_H", "MCLK",
+			"MIC BIAS External", "Handset Mic",
+			"MIC BIAS Internal2", "Headset Mic",
+			"MIC BIAS External", "Secondary Mic",
+			"AMIC1", "MIC BIAS External",
+			"AMIC2", "MIC BIAS Internal2",
+			"AMIC3", "MIC BIAS External";
+
+		qcom,msm-gpios =
+			"pri_i2s";
+		qcom,pinctrl-names =
+			"all_off",
+			"pri_i2s_act";
+		pinctrl-names =
+			"all_off",
+			"pri_i2s_act";
+		pinctrl-0 = <&cdc_pdm_lines_sus &cdc_pdm_lines_2_sus>;
+		pinctrl-1 = <&cdc_pdm_lines_act &cdc_pdm_lines_2_act>;
+		asoc-platform = <&pcm0>, <&pcm1>, <&pcm2>, <&voip>, <&voice>,
+			<&loopback>, <&compress>, <&hostless>,
+			<&afe>, <&lsm>, <&routing>, <&lpa>,
+			<&voice_svc>;
+		asoc-platform-names = "msm-pcm-dsp.0", "msm-pcm-dsp.1",
+			"msm-pcm-dsp.2", "msm-voip-dsp",
+			"msm-pcm-voice", "msm-pcm-loopback",
+			"msm-compress-dsp", "msm-pcm-hostless",
+			"msm-pcm-afe", "msm-lsm-client",
+			"msm-pcm-routing", "msm-pcm-lpa",
+			"msm-voice-svc";
+		asoc-cpu = <&dai_pri_auxpcm>, <&dai_hdmi>,
+			<&dai_mi2s0>, <&dai_mi2s1>, <&dai_mi2s2>,
+			<&dai_mi2s3>, <&dai_mi2s5>, <&dai_mi2s6>,
+			<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
+			<&sb_3_rx>, <&sb_3_tx>, <&sb_4_rx>, <&sb_4_tx>,
+			<&bt_sco_rx>, <&bt_sco_tx>, <&int_fm_rx>,
+			<&int_fm_tx>, <&afe_pcm_rx>, <&afe_pcm_tx>,
+			<&afe_proxy_rx>, <&afe_proxy_tx>,
+			<&incall_record_rx>, <&incall_record_tx>,
+			<&incall_music_rx>, <&incall_music_2_rx>;
+		asoc-cpu-names = "msm-dai-q6-auxpcm.1", "msm-dai-q6-hdmi.8",
+			"msm-dai-q6-mi2s.0", "msm-dai-q6-mi2s.1",
+			"msm-dai-q6-mi2s.2", "msm-dai-q6-mi2s.3",
+			"msm-dai-q6-mi2s.5", "msm-dai-q6-mi2s.6",
+			"msm-dai-q6-dev.16384", "msm-dai-q6-dev.16385",
+			"msm-dai-q6-dev.16386", "msm-dai-q6-dev.16387",
+			"msm-dai-q6-dev.16390", "msm-dai-q6-dev.16391",
+			"msm-dai-q6-dev.16392", "msm-dai-q6-dev.16393",
+			"msm-dai-q6-dev.12288", "msm-dai-q6-dev.12289",
+			"msm-dai-q6-dev.12292", "msm-dai-q6-dev.12293",
+			"msm-dai-q6-dev.224", "msm-dai-q6-dev.225",
+			"msm-dai-q6-dev.241", "msm-dai-q6-dev.240",
+			"msm-dai-q6-dev.32771", "msm-dai-q6-dev.32772",
+			"msm-dai-q6-dev.32773", "msm-dai-q6-dev.32770";
+		asoc-codec = <&stub_codec>, <&pm8950_cajon_dig>;
+		asoc-codec-names = "msm-stub-codec.1", "cajon_codec";
+
+	};
+};
+&slim_msm{
+	status = "disabled";
+};
+
+&pm8950_cajon_dig {
+	status = "ok";
+};
+
+&pm8950_cajon_analog {
+	status = "ok";
+};
+
+

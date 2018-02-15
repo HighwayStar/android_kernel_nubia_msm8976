@@ -1,0 +1,79 @@
+/* Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&spmi_bus {
+
+	qcom,pmi8950@2 {
+
+
+		pmi8950_charger: qcom,qpnp-smbcharger {
+			qcom,float-voltage-mv = <4400>;  //ZTEMT modify 4200 --> 4400
+			qcom,resume-delta-mv = <50>;     //ZTEMT modify 200 --> 50
+			/delete-property/ qcom,parallel-usb-min-current-ma;
+			/delete-property/ qcom,parallel-usb-9v-min-current-ma;
+			/delete-property/ qcom,parallel-allowed-lowering-ma;
+			
+			/*ZTEMT Add*/
+			qcom,charging-timeout-mins = <768>;
+			
+			qcom,fastchg-current-ma = <2800>;
+			nubia,warm-using-cntl;
+			nubia,warm-using-ibatt-ma = <500>;
+			nubia,warm-using-dec = <400>;
+
+			nubia,warm-chging-ma = <250>;
+			nubia,warm-chging-mv = <4100>;
+			nubia,warm-chging-dec2 = <460>;
+			nubia,cool-chging-ma = <700>;
+			
+			qcom,smbchg-vadc = <&pmi8950_vadc>;
+			/delete-property/ qcom,enable-hvdcp-9v;
+			nubia,disable-pm-led;
+			/*ZTEMT end*/
+		};
+
+		pmi8950_fg: qcom,fg {
+			qcom,resume-soc = <99>; //ZTEMT modify 95 --> 99
+			//ZTEMT modify && add,  !!Note!!:  these values will replace : struct fg_mem_setting settings in qpnp-fg.c
+			qcom,fg-cutoff-voltage-mv = <3300>;  //ZTEMT modify 3400 --> 3300
+
+			qcom,cold-bat-decidegc = <(-30)>;
+			qcom,cool-bat-decidegc = <100>;
+			qcom,warm-bat-decidegc = <430>;
+			qcom,hot-bat-decidegc = <500>;
+
+			qcom,irq-volt-empty-mv = <3100>;
+			qcom,vbat-estimate-diff-mv = <200>;//ztemt modify 150 -->200
+
+			qcom,thermal-coefficients = [EC 85 75 4A FC 35];
+			qcom,hold-soc-while-full;
+			nubia,use-default-batt-type = "ztemt_lg_3000mah";
+			qcom,ext-sense-type;
+			//ZTEMT end 
+			
+		};
+	};
+
+	qcom,pmi8950@3 {
+
+		qcom,leds@d800 {
+			qcom,en-cabc;
+		};
+		pmi8950_haptic: qcom,haptic@c000 {
+			qcom,vmax-mv = <3000>;
+			qcom,int-pwm-freq-khz = <1076>;
+			qcom,brake-pattern = [03 03 03 03];
+			qcom,ztemt_vibrator_ms = <40>;
+			qcom,actuator-type = "erm";
+		};
+	};
+};
