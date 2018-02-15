@@ -1,0 +1,8 @@
+config NUBIA_SENSORS_FP_GF5216M
+	tristate "nubia sensors fp gf5216m"
+	depends on NUBIA_SENSORS_FP
+	default n
+	help
+	  This is the main file for fingerprint driver for gf5216m.
+	  Say Y here if you have a gf5216m fingerprint connected
+	  to your system.
