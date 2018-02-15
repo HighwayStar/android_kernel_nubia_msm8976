@@ -58,7 +58,13 @@ source "sound/soc/ux500/Kconfig"
 
 # Supported codecs
 source "sound/soc/codecs/Kconfig"
-
+#added by ylqin              -----begin
+config NUBIA_AUDIO
+       bool "AUDIO MACRO for the same info for NX591J"
+       default n
+       help
+           AUDIO MACRO for NUBIA NX591J
+#added by ylqin              -----end
 # generic frame-work
 source "sound/soc/generic/Kconfig"
 

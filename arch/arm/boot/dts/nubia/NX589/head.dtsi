@@ -1,0 +1,15 @@
+/*
+ * nubia overwrite dts
+ */
+
+#include "sample.dtsi"
+#include "others.dtsi"
+#include "nubia-typec.dtsi"
+#include "display.dtsi"
+#include "touch.dtsi"
+#include "nfc.dtsi"
+#include "finger.dtsi"
+#include "audio.dtsi"
+#include "camera.dtsi"
+#include "camera-pinctrl.dtsi"
+#include "sensors.dtsi"

@@ -205,10 +205,11 @@
 			qcom,rparasitic-uohm = <100000>;
 			qcom,bms-psy-name = "bms";
 			qcom,thermal-mitigation = <1500 700 600 0>;
-			qcom,parallel-usb-min-current-ma = <1400>;
-			qcom,parallel-usb-9v-min-current-ma = <900>;
-			qcom,parallel-allowed-lowering-ma = <500>;
-			qcom,autoadjust-vfloat;
+			//NUBIA Del by hongdanlong power 2017.04.13 BEGIN
+			//qcom,parallel-usb-min-current-ma = <1400>;
+			//qcom,parallel-usb-9v-min-current-ma = <900>;
+			//qcom,parallel-allowed-lowering-ma = <500>;
+			//NUBIA Del by hongdanlong power 2017.04.13 END
 			qcom,pmic-revid = <&pmi8950_revid>;
 			qcom,charge-unknown-battery;
 			qcom,force-aicl-rerun;
@@ -617,17 +618,18 @@
 			qcom,wave-play-rate-us = <5263>;
 			qcom,actuator-type = "erm";
 			qcom,wave-shape = "square";
-			qcom,vmax-mv = <2000>;
+			qcom,vmax-mv = <3000>;
 			qcom,ilim-ma = <800>;
 			qcom,sc-deb-cycles = <8>;
-			qcom,int-pwm-freq-khz = <505>;
+			qcom,int-pwm-freq-khz = <1076>;
 			qcom,en-brake;
-			qcom,brake-pattern = [03 03 00 00];
+			qcom,brake-pattern = [03 03 03 03];
 			qcom,use-play-irq;
 			qcom,use-sc-irq;
 			qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
 			qcom,wave-rep-cnt = <1>;
 			qcom,wave-samp-rep-cnt = <1>;
+			qcom,ztemt_vibrator_ms = <40>;
 		};
 	};
 };

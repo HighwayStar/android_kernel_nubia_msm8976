@@ -20,6 +20,13 @@ config POWER_RESET_MSM
 	help
 	  Power off and restart support for Qualcomm boards.
 
+config NUBIA_PANIC_BOOTMODE
+       bool "nubia panic bootmode"
+       depends on POWER_RESET_MSM
+       default y
+       help
+         nubia panic bootmode.
+
 config MSM_DLOAD_MODE
 	bool "Qualcomm download mode"
 	depends on POWER_RESET_MSM
@@ -52,3 +59,9 @@ config POWER_RESET_VEXPRESS
 	help
 	  Power off and reset support for the ARM Ltd. Versatile
 	  Express boards.
+
+config NUBIA_RESTART
+       bool "NUBIA restart"
+       default y
+       help
+         Support for the NUBIA restart

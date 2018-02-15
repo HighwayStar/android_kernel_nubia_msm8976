@@ -1092,7 +1092,7 @@
 		clocks = <&clock_gcc clk_gcc_blsp1_uart2_apps_clk>,
 		       <&clock_gcc clk_gcc_blsp1_ahb_clk>;
 	};
-
+	
 	blsp1_uart0: uart@78af000 {
 		compatible = "qcom,msm-hsuart-v14";
 		reg = <0x78af000 0x200>,
@@ -2141,6 +2141,7 @@
 		qcom,bam-consumer-pipe-index = <4>;
 		qcom,bam-producer-pipe-index = <5>;
 		qcom,master-id = <86>;
+		status = "ok";//ZTEMT:change by huaweifeng 
 	};
 
 	qcom,msm-ssc-sensors {
@@ -2904,8 +2905,16 @@
 		status = "ok";
 		qcom,mode = <1>;
 		qcom,pull = <5>;
-		qcom,vin-sel = <0>;
-		qcom,src-sel = <0>;
+		qcom,vin-sel = <3>;
+		qcom,src-sel = <2>;
+		qcom,master-en = <1>;
+	};
+	gpio@c500 {
+		status = "ok";
+		qcom,mode = <1>;
+		qcom,pull = <5>;
+		qcom,vin-sel = <3>;
+		qcom,src-sel = <2>;
 		qcom,master-en = <1>;
 	};
 	gpio@c400 {
@@ -2974,6 +2983,7 @@
 
 		qcom,cdc-on-demand-supplies = "cdc-vdd-mic-bias";
 		qcom,dig-cdc-base-addr = <0xc0f0000>;
+		qcom,cdc-micbias-cfilt-mv = <2700000>;
 	};
 
 	pm8950_cajon_analog: 8952_wcd_codec@f100 {

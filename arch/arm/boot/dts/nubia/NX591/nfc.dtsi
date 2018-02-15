@@ -1,0 +1,71 @@
+/*
+ * nubia overwrite dts
+ */
+&i2c_6 {
+	/* add for brcm NFC */
+        broadcom_bcm2079x_nfc@77{
+                compatible = "broadcom,bcm2079x_nfc";
+                reg = <0x77>;
+                broadcom,irq-gpio = <&msm_gpio 13 0x00>;
+                broadcom,en-gpio = <&msm_gpio 12 0x00>;
+                broadcom,wake-gpio = <&msm_gpio 34 0x00>;
+                interrupt-parent = <&msm_gpio>;
+                interrupts = <13 0>;
+                interrupt-names = "BRCM_NFC_INT";
+                pinctrl-names = "bcm2079x_pin_active","bcm2079x_pin_suspend";
+                pinctrl-0 = <&bcm2079x_int_active &bcm2079x_en_active &bcm2079x_ctl_active>;
+                pinctrl-1 = <&bcm2079x_int_suspend &bcm2079x_en_suspend &bcm2079x_ctl_suspend>;
+                broadcom,clk-gpio = <&pm8950_gpios 5 0x00>;
+                clocks = <&clock_gcc clk_bb_clk2_pin>;
+                clock-names = "ref_clk";
+        };
+};
+&soc {
+        tlmm_pinmux: pinctrl@1000000 {
+		bcm2079x_int_pin{
+                        qcom,pins = <&gp 13>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "bcm2079x_int_pin";
+
+                        bcm2079x_int_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+
+                        bcm2079x_int_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                };
+		bcm2079x_en_pin{
+                        qcom,pins = <&gp 12>;
+                        qcom,num-grp-pins = <1>;
+                        qcom,pin-func = <0>;
+                        label = "bcm2079x_en_pin";
+                        bcm2079x_en_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                        bcm2079x_en_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-disable;
+                        };
+                };
+                bcm2079x_ctl_pin{
+                        qcom,pins =  <&gp 34>;
+                        //pins = "gpio34";
+                        qcom,num-grp-pins = <1>;
+                        qcom,pin-func = <0>;
+                        label = "bcm2079x_ctl_pin";
+                        bcm2079x_ctl_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                        bcm2079x_ctl_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-disable;
+                        };
+                };
+	};
+};

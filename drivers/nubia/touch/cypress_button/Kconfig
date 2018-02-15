@@ -1,0 +1,9 @@
+#
+# Cypress touch button driver configuration
+#
+config NUBIA_TOUCHSCREEN_CYPRESS_BUTTON
+	tristate "Cypress button"
+	default n
+	help
+	  Say Y here if you have a Cypress touch button connected
+	  to your system.

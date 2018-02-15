@@ -25,6 +25,11 @@
 #undef CDBG
 #define CDBG(fmt, args...) pr_debug(fmt, ##args)
 
+extern int imx258_main_state;
+extern int imx258_aux_state;
+extern int s5k3p8sp_state;
+extern int ov5675_state;
+
 int msm_camera_fill_vreg_params(struct camera_vreg_t *cam_vreg,
 	int num_vreg, struct msm_sensor_power_setting *power_setting,
 	uint16_t power_setting_size)
@@ -1404,14 +1409,14 @@ int msm_camera_power_up(struct msm_camera_power_ctrl_t *ctrl,
 			if (!ctrl->gpio_conf->gpio_num_info->valid
 				[power_setting->seq_val])
 				continue;
-			CDBG("%s:%d gpio set val %d\n", __func__, __LINE__,
-				ctrl->gpio_conf->gpio_num_info->gpio_num
-				[power_setting->seq_val]);
-			gpio_set_value_cansleep(
-				ctrl->gpio_conf->gpio_num_info->gpio_num
-				[power_setting->seq_val],
-				(int) power_setting->config_val);
-			break;
+                        CDBG("%s:%d gpio set val %d\n", __func__, __LINE__,
+                            ctrl->gpio_conf->gpio_num_info->gpio_num
+                            [power_setting->seq_val]);
+                        gpio_set_value_cansleep(
+                            ctrl->gpio_conf->gpio_num_info->gpio_num
+                            [power_setting->seq_val],
+                            (int) power_setting->config_val);
+                        break;
 		case SENSOR_VREG:
 			if (power_setting->seq_val == INVALID_VREG)
 				break;
@@ -1594,11 +1599,26 @@ int msm_camera_power_down(struct msm_camera_power_ctrl_t *ctrl,
 			if (!ctrl->gpio_conf->gpio_num_info->valid
 				[pd->seq_val])
 				continue;
-			gpio_set_value_cansleep(
-				ctrl->gpio_conf->gpio_num_info->gpio_num
-				[pd->seq_val],
-				(int) pd->config_val);
-			break;
+                        //ZTEMT: guxiaodong add for sharing voltage ---start
+                        if((imx258_main_state == 1)&&(imx258_aux_state == 1)&&((pd->seq_val == SENSOR_GPIO_VIO) ||(pd->seq_val == SENSOR_GPIO_VANA)))
+                        {
+				pr_err("%s rear dual camera power on break : SENSOR_GPIO_VIO\n", __func__);
+				break;
+			}
+                        else if((s5k3p8sp_state == 1)&&(ov5675_state == 1)&&((pd->seq_val == SENSOR_GPIO_VIO) || (pd->seq_val == SENSOR_GPIO_STANDBY)))
+                        {
+                               pr_err("%s front dual camera power on break \n", __func__);
+			       break;
+                        }
+                        else
+                        {
+                            gpio_set_value_cansleep(
+                                ctrl->gpio_conf->gpio_num_info->gpio_num
+                                [pd->seq_val],
+                                (int) pd->config_val);
+                            break;
+                        }
+                        //ZTEMT: guxiaodong add for sharing voltage ---end
 		case SENSOR_VREG:
 			if (pd->seq_val == INVALID_VREG)
 				break;

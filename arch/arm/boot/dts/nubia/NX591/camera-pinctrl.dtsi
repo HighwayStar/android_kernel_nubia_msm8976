@@ -1,0 +1,305 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ //* Add by nubia camera  start*/
+&spi_0 { 
+	spi-max-frequency = <50000000>;
+
+	mini_isp@0 {
+		compatible = "altek,mini_isp";
+		reg = <0>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <142 0x00>;
+		qcom,qup-id = <1>;
+		spi-max-frequency = <50000000>;
+		pinctrl-name = "pmx_ts_active","pmx_ts_suspend";
+		pinctrl-0 = <&al3200_gpio_int_active &al3200_gpio_active>;
+		pinctrl-1 = <&al3200_gpio_int_sleep &al3200_gpio_sleep>;
+		clocks = <&clock_gcc clk_div_clk2>;
+		clock-names = "al3200_clk";
+		qcom,clock-rates = <19200000>;
+		reset-gpios = <&msm_gpio 67 0x00>;
+		irq-gpios = <&msm_gpio 142  0x00>;
+		vcc1-gpios = <&msm_gpio 20 0x00>;//mipi_vcc0v9
+		vcc2-gpios = <&msm_gpio 21 0x00>;//vcc0v9
+		vcc1v8-gpios = <&msm_gpio 31 0x00>;
+		status = "ok";
+	};
+};
+/* Add by nubia camera  end*/
+
+ &tlmm_pinmux {
+        al3200_gpio_int_active {
+			qcom,pins = <&gp 142>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "al3200_gpio_int_active";
+			al3200_gpio_int_active: al3200_gpio_int_active {
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+		al3200_gpio_int_sleep {
+			qcom,pins = <&gp 142>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "al3200_gpio_int_sleep";
+			al3200_gpio_int_sleep: al3200_gpio_int_sleep {
+				drive-strength = <2>;
+			    bias-pull-down;
+			};
+		};
+		al3200_gpio_active {
+			qcom,pins = <&gp 20>, <&gp 21>, <&gp 67>, <&gp 31>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <4>;
+			label = "al3200_gpio_active";
+			al3200_gpio_active: al3200_gpio_active {
+				drive-strength = <2>;
+				bias-disable; /* No PULL */
+			};
+		};
+		al3200_gpio_sleep {
+			qcom,pins = <&gp 20>, <&gp 21>, <&gp 67>, <&gp 31>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <4>;
+			label = "al3200_gpio_sleep";
+			al3200_gpio_sleep: al3200_gpio_sleep {
+				drive-strength = <2>;
+				bias-disable; /* No PULL */
+			};
+		};
+		
+	 /*sensors */
+	 cam_sensor_mclk0_default {
+		 /* MCLK0 */
+		 qcom,pins = <&gp 26>;
+		 qcom,num-grp-pins = <1>;
+		 qcom,pin-func = <1>;
+		 label = "cam_sensor_mclk0_default";
+		 /* active state */
+		 cam_sensor_mclk0_default: cam_sensor_mclk0_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_mclk0_sleep {
+		 /* MCLK0 */
+		 qcom,pins = <&gp 26>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_mclk0_sleep";
+		 /*suspended state */
+		 cam_sensor_mclk0_sleep: cam_sensor_mclk0_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-pull-down; /* PULL DOWN */
+		 };
+	 };
+	 
+	 cam_sensor_rear_default {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 129>, <&gp 107>, <&gp 31>;//ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_rear_default";
+		 /* active state */
+		 cam_sensor_rear_default: cam_sensor_rear_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_rear_sleep {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 129>, <&gp 107>, <&gp 31>;//ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_rear_sleep";
+		 /*suspended state */
+		 cam_sensor_rear_sleep: cam_sensor_rear_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_rear_vana {
+		 /* VANA */
+		 qcom,pins = <&gp 63>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_rear_vana";
+		 /* active state */
+		 cam_sensor_rear_vana: cam_sensor_rear_vana {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_rear_vana_sleep {
+		 /* VANA */
+		 qcom,pins = <&gp 63>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_rear_vana_sleep";
+		 /*suspended state */
+		 cam_sensor_rear_vana_sleep: cam_sensor_rear_vana_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_mclk1_default {
+		 /* MCLK1 */
+		 qcom,pins = <&gp 27>;
+		 qcom,num-grp-pins = <1>;
+		 qcom,pin-func = <1>;
+		 label = "cam_sensor_mclk1_default";
+		 /* active state */
+		 cam_sensor_mclk1_default: cam_sensor_mclk1_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_mclk1_sleep {
+		 /* MCLK1 */
+		 qcom,pins = <&gp 27>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_mclk1_sleep";
+		 /*suspended state */
+		 cam_sensor_mclk1_sleep: cam_sensor_mclk1_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-pull-down; /* PULL DOWN */
+		 };
+	 };
+	 
+	 cam_sensor_front_default {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 130>, <&gp 63>, <&gp 31>, <&gp 49>, <&gp 50>; //ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_front_default";
+		 /* active state */
+		 cam_sensor_front_default: cam_sensor_front_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_front_sleep {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 130>, <&gp 63>, <&gp 31>, <&gp 49>, <&gp 50>; //ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_front_sleep";
+		 /*suspended state */
+		 cam_sensor_front_sleep: cam_sensor_front_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_front_vdig {
+		 /* VDIG */
+		 qcom,pins = <&gp 105>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_front_vdig";
+		 /* active state */
+		 cam_sensor_front_vdig: cam_sensor_front_vdig {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_front_vdig_sleep {
+		 /* VDIG */
+		 qcom,pins = <&gp 105>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_front_vdig_sleep";
+		 /*suspended state */
+		 cam_sensor_front_vdig_sleep:
+			 cam_sensor_front_vdig_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_mclk2_default {
+		 /* MCLK2 */
+		 qcom,pins = <&gp 28>;
+		 qcom,num-grp-pins = <1>;
+		 qcom,pin-func = <1>;
+		 label = "cam_sensor_mclk2_default";
+		 /* active state */
+		 cam_sensor_mclk2_default: cam_sensor_mclk2_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_mclk2_sleep {
+		 /* MCLK2 */
+		 qcom,pins = <&gp 28>;
+		 qcom,num-grp-pins = <1>;
+		 label = "cam_sensor_mclk2_sleep";
+		 /*suspended state */
+		 cam_sensor_mclk2_sleep: cam_sensor_mclk2_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-pull-down; /* PULL DOWN */
+		 };
+	 };
+	 
+	 cam_sensor_front1_default {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 131>, <&gp 66>, <&gp 31>, <&gp 49>, <&gp 50>;//ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_front1_default";
+		 /* active state */
+		 cam_sensor_front1_default: cam_sensor_front1_default {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+	 
+	 cam_sensor_front1_sleep {
+		 /* RESET, STANDBY */
+		 qcom,pins = <&gp 131>, <&gp 66>, <&gp 31>, <&gp 49>, <&gp 50>;//ZTEMT:change by huaweifeng 
+		 qcom,num-grp-pins = <2>;
+		 label = "cam_sensor_front1_sleep";
+		 /*suspended state */
+		 cam_sensor_front1_sleep: cam_sensor_front1_sleep {
+			 drive-strength = <2>; /* 2 MA */
+			 bias-disable; /* No PULL */
+		 };
+	 };
+ };
+
+&rpm_bus{
+	rpm-regulator-ldoa3 {
+		status = "okay";
+		pm8950_l3: regulator-l3 {
+			regulator-min-microvolt = <1000000>;
+			regulator-max-microvolt = <1200000>;//huaweifeng modify for camera
+			qcom,init-voltage = <1000000>;
+			status = "okay";
+		};
+	};
+};
+&soc {
+		blsp1_uart0: uart@78af000 {
+			status = "disabled";
+		};
+		clock_audio: audio_ext_clk {
+			status = "disabled";
+	};
+};
+
+&slim_msm {
+	tasha_codec {
+		status = "disabled";
+	};
+};
+

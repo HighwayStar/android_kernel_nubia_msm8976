@@ -17,6 +17,10 @@ config FB_MSM
 
 if FB_MSM
 
+config NUBIA_LCD_WLED_AND_DCS
+	bool "LCD backlight wled and dcs"
+	default n
+
 config FB_MSM_BACKLIGHT
 	bool "Support for backlight control"
 	default y

@@ -151,5 +151,12 @@ config HIGH_RES_TIMERS
 	  hardware is not capable then this option only increases
 	  the size of the kernel image.
 
+config NUBIA_FEATURE_POWER_OFF_CHARGE_MODE_ALARM
+        bool "Power off charge mode alarm reboot support"
+        help
+          ztemt feature: if set,in power off charge mode,
+          when poweroff alarm trigger,
+          kernel will reboot with rtc
+
 endmenu
 endif

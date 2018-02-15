@@ -1,0 +1,117 @@
+#
+# Synaptics BUTTON touchscreen driver configuration
+#
+menuconfig NUBIA_TOUCHBUTTON_SYNAPTICS_S1302
+	bool "Synaptics BUTTON S1302 touchscreen"
+	default n
+	help
+	  Say Y here if you have a Synaptics BUTTON touchscreen connected
+	  to your system.
+
+	  If unsure, say N.
+
+if NUBIA_TOUCHBUTTON_SYNAPTICS_S1302
+
+choice
+	default NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_I2C
+	prompt "Synaptics BUTTON bus interface"
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_I2C
+	bool "RMI over I2C"
+	depends on I2C
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_SPI
+	bool "RMI over SPI"
+	depends on SPI_MASTER
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_RMI_HID_I2C
+	bool "HID over I2C"
+	depends on I2C
+endchoice
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	tristate "Synaptics BUTTON core driver module"
+	depends on I2C || SPI_MASTER
+	help
+	  Say Y here to enable basic touch reporting functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_core.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_RMI_DEV
+	tristate "Synaptics BUTTON RMI device module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for direct RMI register access.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_rmi_dev.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_FW_UPDATE
+	tristate "Synaptics BUTTON firmware update module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for doing firmware update.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_fw_update.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_TEST_REPORTING
+	tristate "Synaptics BUTTON test reporting module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for retrieving production test reports.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_test_reporting.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_PROXIMITY
+	tristate "Synaptics BUTTON proximity module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for proximity functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_proximity.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_ACTIVE_PEN
+	tristate "Synaptics BUTTON active pen module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for active pen functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_active_pen.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_GESTURE
+	tristate "Synaptics BUTTON user defined gesture module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for user defined gesture functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_gesture.
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_VIDEO
+	tristate "Synaptics BUTTON video module"
+	depends on NUBIA_TOUCHBUTTON_SYNAPTICS_S1302_CORE
+	help
+	  Say Y here to enable support for video communication functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_video.
+
+endif

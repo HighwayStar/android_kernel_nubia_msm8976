@@ -36,6 +36,7 @@
 #include <linux/alarmtimer.h>
 #include <linux/qpnp-revid.h>
 
+
 /* Register offsets */
 
 /* Interrupt offsets */
@@ -305,7 +306,9 @@ module_param_named(
 	debug_mask, fg_debug_mask, int, S_IRUSR | S_IWUSR
 );
 
+
 static int fg_reset_on_lockup;
+
 
 static int fg_sense_type = -EINVAL;
 static int fg_restart;
@@ -630,6 +633,8 @@ static char *fg_supplicants[] = {
 	"bcl",
 	"fg_adc"
 };
+
+
 
 #define DEBUG_PRINT_BUFFER_SIZE 64
 static void fill_string(char *str, size_t str_len, u8 *buf, int buf_len)
@@ -1475,7 +1480,9 @@ static int __fg_interleaved_mem_write(struct fg_chip *chip, u8 *val,
 
 		rc = fg_check_iacs_ready(chip);
 		if (rc) {
+
 			pr_debug("IACS_RDY failed rc=%d\n", rc);
+
 			return rc;
 		}
 
@@ -1522,6 +1529,7 @@ static int __fg_interleaved_mem_read(struct fg_chip *chip, u8 *val, u16 address,
 		rc = fg_check_iacs_ready(chip);
 		if (rc) {
 			pr_debug("IACS_RDY failed rc=%d\n", rc);
+
 			return rc;
 		}
 
@@ -1605,6 +1613,7 @@ static int fg_interleaved_mem_config(struct fg_chip *chip, u8 *val,
 	rc = fg_check_iacs_ready(chip);
 	if (rc) {
 		pr_debug("IACS_RDY failed rc=%d\n", rc);
+
 		return rc;
 	}
 
@@ -1617,7 +1626,9 @@ static int fg_interleaved_mem_config(struct fg_chip *chip, u8 *val,
 
 	rc = fg_check_iacs_ready(chip);
 	if (rc)
+
 		pr_debug("IACS_RDY failed rc=%d\n", rc);
+
 
 	return rc;
 }
@@ -1628,7 +1639,9 @@ static int fg_interleaved_mem_config(struct fg_chip *chip, u8 *val,
 static int fg_interleaved_mem_read(struct fg_chip *chip, u8 *val, u16 address,
 						int len, int offset)
 {
+
 	int rc = 0, orig_address = address;
+
 	u8 start_beat_count, end_beat_count, count = 0;
 	bool retry = false;
 
@@ -1709,9 +1722,11 @@ retry:
 	}
 out:
 	/* Release IMA access */
+
 	rc = fg_masked_write(chip, MEM_INTF_CFG(chip), IMA_REQ_ACCESS, 0, 1);
 	if (rc)
 		pr_err("failed to reset IMA access bit rc = %d\n", rc);
+
 
 	if (retry) {
 		retry = false;
@@ -1727,7 +1742,9 @@ exit:
 static int fg_interleaved_mem_write(struct fg_chip *chip, u8 *val, u16 address,
 							int len, int offset)
 {
+
 	int rc = 0, orig_address = address;
+
 	u8 count = 0;
 
 	if (chip->fg_shutdown)
@@ -1772,6 +1789,7 @@ retry:
 
 out:
 	/* Release IMA access */
+
 	rc = fg_masked_write(chip, MEM_INTF_CFG(chip), IMA_REQ_ACCESS, 0, 1);
 	if (rc)
 		pr_err("failed to reset IMA access bit rc = %d\n", rc);
@@ -2116,8 +2134,10 @@ static int get_prop_capacity(struct fg_chip *chip)
 	if (!chip->profile_loaded && !chip->use_otp_profile)
 		return DEFAULT_CAPACITY;
 
+
 	if (chip->charge_full)
 		return FULL_CAPACITY;
+
 
 	if (chip->soc_empty) {
 		if (fg_debug_mask & FG_POWER_SUPPLY)
@@ -4008,6 +4028,7 @@ static int fg_power_set_property(struct power_supply *psy,
 		chip->status = val->intval;
 		schedule_work(&chip->status_change_work);
 		check_gain_compensation(chip);
+
 		break;
 	case POWER_SUPPLY_PROP_HEALTH:
 		chip->health = val->intval;
@@ -4598,6 +4619,7 @@ done:
 #define RSLOW_CFG_OFFSET		2
 #define RSLOW_THRESH_REG		0x52C
 #define RSLOW_THRESH_OFFSET		0
+
 #define TEMP_RS_TO_RSLOW_OFFSET		2
 #define RSLOW_COMP_REG			0x528
 #define RSLOW_COMP_C1_OFFSET		0
@@ -4670,13 +4692,16 @@ static int populate_system_data(struct fg_chip *chip)
 		goto done;
 	}
 	chip->rslow_comp.rslow_thr = buffer[0];
+
 	rc = fg_mem_read(chip, buffer, TEMP_RS_TO_RSLOW_REG, 2,
 			RSLOW_THRESH_OFFSET, 0);
 	if (rc) {
 		pr_err("unable to read rs to rslow: %d\n", rc);
 		goto done;
 	}
+
 	memcpy(chip->rslow_comp.rs_to_rslow, buffer, 2);
+
 	rc = fg_mem_read(chip, buffer, RSLOW_COMP_REG, 4,
 			RSLOW_COMP_C1_OFFSET, 0);
 	if (rc) {
@@ -4715,8 +4740,10 @@ static int fg_rslow_charge_comp_set(struct fg_chip *chip)
 	}
 
 	half_float_to_buffer(chip->rslow_comp.chg_rs_to_rslow, buffer);
+
 	rc = fg_mem_write(chip, buffer,
 			TEMP_RS_TO_RSLOW_REG, 2, TEMP_RS_TO_RSLOW_OFFSET, 0);
+
 	if (rc) {
 		pr_err("unable to write rs to rslow: %d\n", rc);
 		goto done;
@@ -4768,8 +4795,10 @@ static int fg_rslow_charge_comp_clear(struct fg_chip *chip)
 		goto done;
 	}
 
+
 	rc = fg_mem_write(chip, chip->rslow_comp.rs_to_rslow,
 			TEMP_RS_TO_RSLOW_REG, 2, TEMP_RS_TO_RSLOW_OFFSET, 0);
+
 	if (rc) {
 		pr_err("unable to write rs to rslow: %d\n", rc);
 		goto done;
@@ -5021,6 +5050,7 @@ static int fg_batt_profile_init(struct fg_chip *chip)
 	bool tried_again = false, vbat_in_range, profiles_same;
 	u8 reg = 0;
 
+
 wait:
 	fg_stay_awake(&chip->profile_wakeup_source);
 	ret = wait_for_completion_interruptible_timeout(&chip->batt_id_avail,
@@ -5045,6 +5075,7 @@ wait:
 
 	profile_node = of_batterydata_get_best_profile(batt_node, "bms",
 							fg_batt_type);
+
 	if (!profile_node) {
 		pr_err("couldn't find profile handle\n");
 		old_batt_type = default_batt_type;
@@ -5135,6 +5166,7 @@ wait:
 		goto fail;
 	}
 
+
 	rc = of_property_read_string(profile_node, "qcom,battery-type",
 					&batt_type_str);
 	if (rc) {
@@ -5166,10 +5198,13 @@ wait:
 		goto no_profile;
 	}
 
+
+
 	vbat_in_range = get_vbat_est_diff(chip)
 			< settings[FG_MEM_VBAT_EST_DIFF].value * 1000;
 	profiles_same = memcmp(chip->batt_profile, data,
 					PROFILE_COMPARE_LEN) == 0;
+
 	if (reg & PROFILE_INTEGRITY_BIT) {
 		fg_cap_learning_load_data(chip);
 		if (vbat_in_range && !fg_is_batt_empty(chip) && profiles_same) {
@@ -5180,9 +5215,11 @@ wait:
 			goto done;
 		}
 	} else {
+
 		pr_info("Battery profile not same, clearing cycle counters\n");
 		clear_cycle_counter(chip);
 	}
+
 	if (fg_est_dump)
 		dump_sram(&chip->dump_sram);
 	if ((fg_debug_mask & FG_STATUS) && !vbat_in_range)
@@ -5242,6 +5279,7 @@ done:
 	chip->battery_missing = is_battery_missing(chip);
 	update_chg_iterm(chip);
 	update_cc_cv_setpoint(chip);
+
 	rc = populate_system_data(chip);
 	if (rc) {
 		pr_err("failed to read ocv properties=%d\n", rc);
@@ -5692,6 +5730,7 @@ static int fg_of_init(struct fg_chip *chip)
 				"qcom,cycle-counter-en");
 	if (chip->cyc_ctr.en)
 		chip->cyc_ctr.id = 1;
+
 
 	chip->use_vbat_low_empty_soc = of_property_read_bool(node,
 					"qcom,fg-use-vbat-low-empty-soc");
@@ -6415,6 +6454,8 @@ static int bcl_trim_workaround(struct fg_chip *chip)
 	return 0;
 }
 
+
+
 #define FG_ALG_SYSCTL_1			0x4B0
 #define KI_COEFF_PRED_FULL_ADDR		0x408
 #define TEMP_FRAC_SHIFT_REG		0x4A4
@@ -7048,6 +7089,9 @@ static void delayed_init_work(struct work_struct *work)
 	chip->otg_present = is_otg_present(chip);
 	chip->init_done = true;
 	pr_debug("FG: HW_init success\n");
+
+
+
 	return;
 done:
 	fg_cleanup(chip);
@@ -7232,7 +7276,9 @@ static int fg_probe(struct spmi_device *spmi)
 		goto cancel_work;
 	}
 
+
 	chip->batt_type = default_batt_type;
+
 
 	chip->bms_psy.name = "bms";
 	chip->bms_psy.type = POWER_SUPPLY_TYPE_BMS;
@@ -7334,6 +7380,7 @@ static int fg_suspend(struct device *dev)
 {
 	struct fg_chip *chip = dev_get_drvdata(dev);
 
+
 	if (!chip->sw_rbias_ctrl)
 		return 0;
 
@@ -7346,6 +7393,7 @@ static int fg_suspend(struct device *dev)
 static int fg_resume(struct device *dev)
 {
 	struct fg_chip *chip = dev_get_drvdata(dev);
+
 
 	if (!chip->sw_rbias_ctrl)
 		return 0;

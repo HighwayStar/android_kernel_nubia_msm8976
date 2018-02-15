@@ -1,0 +1,94 @@
+#
+# Touchscreen driver configuration
+#
+
+
+menu "nubia driver touchscreens"
+
+config NUBIA_TOUCHSCREEN_SELECT_SYNAPTICS
+	bool "nubia synaptics touchscreen"
+	default n
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_I2C
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_CORE
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_RMI_DEV
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_FW_UPDATE
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_TEST_REPORTING
+	select TOUCHSCREEN_NUBIA_SYNAPTICS_DSX_GESTURE
+	help
+	  Say Y here if you have a SYNAPTICS touchscreen connected
+	  to your system.
+
+	  If unsure, say N.
+
+if NUBIA_TOUCHSCREEN_SELECT_SYNAPTICS
+source "drivers/nubia/touch/synaptics_dsx/Kconfig"
+endif
+
+config NUBIA_TOUCHSCREENS_SYNAPTICS_DSX
+	bool "config nubia touchscreens synaptics dsx"
+	default n
+	help
+	  Say Y here if you have a nubia touchscreen synaptics dsx connected
+	  to your system.	  If unsure, say N.
+
+if NUBIA_TOUCHSCREENS_SYNAPTICS_DSX
+source "drivers/nubia/touch/nubia_synaptics_dsx/Kconfig"
+endif
+
+config NUBIA_TOUCHSCREEN_CYPRESS
+	bool "config nubia cypress"
+	default n
+	help
+	  Say Y here if you have a Cypress touch connected
+	  to your system.
+
+if NUBIA_TOUCHSCREEN_CYPRESS
+source "drivers/nubia/touch/cypress_button/Kconfig"
+endif
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_DSX_2_7_0
+	bool "config nubia touchscreens synaptics dsx"
+	default n
+	help
+	  Say Y here if you have a nubia touchscreen synaptics dsx connected
+	  to your system.	  If unsure, say N.
+
+if NUBIA_TOUCHSCREEN_SYNAPTICS_DSX_2_7_0
+source "drivers/nubia/touch/synaptics_dsx_2.7.0/Kconfig"
+endif
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_2_7_0
+	bool "config nubia touchscreens synaptics button dsx"
+	default n
+	help
+	  Say Y here if you have a nubia touchscreen synaptics button dsx connected
+	  to your system.	  If unsure, say N.
+
+if NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_2_7_0
+source "drivers/nubia/touch/synaptics_btn_2.7.0/Kconfig"
+endif
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_DSX_589
+	bool "config nubia touchscreens synaptics dsx"
+	default n
+	help
+	  Say Y here if you have a nubia touchscreen synaptics dsx connected
+	  to your system.	  If unsure, say N.
+
+if NUBIA_TOUCHSCREEN_SYNAPTICS_DSX_589
+source "drivers/nubia/touch/synaptics_dsx_v589/Kconfig"
+endif
+
+config NUBIA_TOUCHBUTTON_SYNAPTICS_1302
+	bool "config nubia touchscreens synaptics dsx"
+	default n
+	help
+	  Say Y here if you have a nubia touchscreen synaptics dsx connected
+	  to your system.	  If unsure, say N.
+
+if NUBIA_TOUCHBUTTON_SYNAPTICS_1302
+source "drivers/nubia/touch/synaptics_s1302/Kconfig"
+endif
+
+endmenu

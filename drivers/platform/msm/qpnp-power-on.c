@@ -30,6 +30,8 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/qpnp/power-on.h>
 
+#define NUBIA_FEATURE_DEBUG_KEY_REPORT 1
+
 #define CREATE_MASK(NUM_BITS, POS) \
 	((unsigned char) (((1 << (NUM_BITS)) - 1) << (POS)))
 #define PON_MASK(MSB_BIT, LSB_BIT) \
@@ -661,8 +663,13 @@ qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 		return -EINVAL;
 	}
 
+#if NUBIA_FEATURE_DEBUG_KEY_REPORT
+	pr_err("PMIC input: code=%d, sts=0x%hhx\n",
+					cfg->key_code, pon_rt_sts);
+#else
 	pr_debug("PMIC input: code=%d, sts=0x%hhx\n",
 					cfg->key_code, pon_rt_sts);
+#endif
 	key_status = pon_rt_sts & pon_rt_bit;
 
 	/* simulate press event in case release event occured

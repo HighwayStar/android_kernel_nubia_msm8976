@@ -1,0 +1,306 @@
+/* Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+    i2c@78b6000 {
+    tusb320@67 {
+                   compatible = "ti,usbtypec";
+                   reg = <0x67>;
+                   pinctrl-names = "ti_pin_active","ti_pin_suspend";
+                   pinctrl-0 = <&ti_enable_active &ti_int_active>;
+                   pinctrl-1 = <&ti_enable_suspend &ti_int_suspend>;
+                   ti,enable-gpio = <&msm_gpio 52 0>;
+                   ti,int-gpio = <&msm_gpio 106 0>;
+		   ti,cdc-gpio = <&msm_gpio 115 0>;
+		   ti,audio-gpio = <&msm_gpio 75 0>;
+                   ti,switch-en-gpio = <&msm_gpio 74 0>;
+                };
+	fusb301@25 {
+                   compatible = "fchild,usbtypec";
+                   reg = <0x25>;
+                   pinctrl-names = "fchild_pin_active","fchild_pin_suspend";
+/*                 pinctrl-0 = <&fchild_enable_active &fchild_int_active>;
+                   pinctrl-1 = <&fchild_enable_suspend &fchild_int_suspend>;
+                   fchild,enable-gpio = <&msm_gpio 52 0>;*/
+	           pinctrl-0 = <&fchild_int_active>;
+                   pinctrl-1 = <&fchild_int_suspend>;
+                   fchild,int-gpio = <&msm_gpio 106 0>;
+                };
+	ptn5150@21 {
+		     compatible = "nxp,usbtypec";
+                   reg = <0x21>;
+                   pinctrl-names = "nxp_pin_active","nxp_pin_suspend";
+                   pinctrl-0 = <&nxp_enable_active &nxp_int_active>;
+                   pinctrl-1 = <&nxp_enable_suspend &nxp_int_suspend>;
+                   nxp,enable-gpio = <&msm_gpio 52 0>;
+                   nxp,int-gpio = <&msm_gpio 106 0>;
+                };
+	pi5u@3d {
+		     compatible = "pericom,usbtypec";
+                   reg = <0x3d>;
+                   pinctrl-names = "pericom_pin_active","pericom_pin_suspend";
+                   pinctrl-0 = <&pericom_enable_active &pericom_int_active>;
+                   pinctrl-1 = <&pericom_enable_suspend &pericom_int_suspend>;
+                   pericom,enable-gpio = <&msm_gpio 52 0>;
+                   pericom,int-gpio = <&msm_gpio 106 0>;
+                   pericom,cdc-gpio = <&msm_gpio 115 0>;
+                   pericom,audio-gpio = <&msm_gpio 75 0>;
+                   pericom,switch-en-gpio = <&msm_gpio 74 0>;
+                 };
+    };
+};
+&soc{
+	tlmm_pinmux: pinctrl@1000000{
+		ti_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_int_pin";
+
+			ti_int_active: ti_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+			ti_int_suspend: ti_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+		};
+
+		ti_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_enable_pin";
+			ti_enable_active: ti_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			ti_enable_suspend: ti_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		ti_cdc_pin{
+			qcom,pins = <&gp 115>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_cdc_pin";
+			ti_cdc_active: ti_cdc_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			ti_cdc_suspend: ti_cdc_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		ti_audio_pin{
+			qcom,pins = <&gp 75>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_audio_pin";
+			ti_audio_active: ti_audio_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			ti_audio_suspend: ti_audio_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		ti_switchen_pin{
+			qcom,pins = <&gp 74>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_switchen_pin";
+			ti_switchen_active: ti_switchen_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			ti_switchen_suspend: ti_switchen_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+		fchild_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "fchild_int_pin";
+
+			fchild_int_active: fchild_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+			fchild_int_suspend: fchild_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+		};
+		/*
+		fchild_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "fchild_enable_pin";
+			fchild_enable_active: fchild_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			fchild_enable_suspend: fchild_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+                };*/
+
+
+		nxp_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "nxp_int_pin";
+
+			nxp_int_active: nxp_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+			nxp_int_suspend: nxp_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+		};
+
+		nxp_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "nxp_enable_pin";
+			nxp_enable_active: nxp_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			nxp_enable_suspend: nxp_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+
+		pericom_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_int_pin";
+
+			pericom_int_active: pericom_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+			pericom_int_suspend: pericom_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			/*		bias-disable;*/
+			};
+		};
+
+		pericom_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_enable_pin";
+			pericom_enable_active: pericom_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			pericom_enable_suspend: pericom_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		pericom_cdc_pin{
+			qcom,pins = <&gp 115>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_cdc_pin";
+			pericom_cdc_active: pericom_cdc_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			pericom_cdc_suspend: pericom_cdc_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		pericom_audio_pin{
+			qcom,pins = <&gp 75>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_audio_pin";
+			pericom_audio_active: pericom_audio_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			pericom_audio_suspend: pericom_audio_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+		pericom_switchen_pin{
+			qcom,pins = <&gp 74>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_switchen_pin";
+			pericom_switchen_active: pericom_switchen_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			pericom_switchen_suspend: pericom_switchen_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+	};
+};

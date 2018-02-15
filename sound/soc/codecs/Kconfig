@@ -367,6 +367,29 @@ config SND_SOC_WCD9306
 config SND_SOC_WCD9330
         tristate
 
+config SND_SOC_AW87319_GENERIC
+        bool "basic Support for AW87319"
+        help
+        This option enables support for AW87319 common drivers.
+config SND_SOC_TAS2555_GENERIC
+	bool "basic Support for TI TAS2555"
+	help
+	This option enables support for TI TAS2555 common drivers.
+
+config TAS2555_CODEC
+	bool "basic Support for TI TAS2555"
+	help
+	This option enables support for TI TAS2555 common drivers.
+
+config TAS2555_REGMAP
+	bool "basic Support for TI TAS2555"
+	help
+	This option enables support for TI TAS2555 common drivers.
+config  TAS2555_MISC
+	bool "basic Support for TI TAS2555"
+	help
+	This option enables support for TI TAS2555 common drivers.
+
 config SND_SOC_WSA881X
         tristate
 

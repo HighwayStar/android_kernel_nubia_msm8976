@@ -30,6 +30,9 @@
 #include <sound/jack.h>
 #include "wcd-mbhc-v2.h"
 #include "wcdcal-hwdep.h"
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+#include "AW87319_Audio_M.h"
+#endif
 
 #define WCD_MBHC_JACK_MASK (SND_JACK_HEADSET | SND_JACK_OC_HPHL | \
 			   SND_JACK_OC_HPHR | SND_JACK_LINEOUT | \
@@ -43,10 +46,18 @@
 #define OCP_ATTEMPT 1
 #define HS_DETECT_PLUG_TIME_MS (3 * 1000)
 #define SPECIAL_HS_DETECT_TIME_MS (2 * 1000)
+#ifdef CONFIG_NUBIA_AUDIO
+#define MBHC_BUTTON_PRESS_THRESHOLD_MIN 800
+#else
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 250
+#endif
 #define GND_MIC_SWAP_THRESHOLD 4
 #define WCD_FAKE_REMOVAL_MIN_PERIOD_MS 100
+#ifdef CONFIG_NUBIA_AUDIO
+#define HS_VREF_MIN_VAL 1300
+#else
 #define HS_VREF_MIN_VAL 1400
+#endif
 #define FW_READ_ATTEMPTS 15
 #define FW_READ_TIMEOUT 4000000
 #define FAKE_REM_RETRY_ATTEMPTS 3
@@ -163,10 +174,20 @@ static void wcd_enable_curr_micbias(const struct wcd_mbhc *mbhc,
 
 	switch (cs_mb_en) {
 	case WCD_MBHC_EN_CS:
+#ifdef CONFIG_NUBIA_AUDIO
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 0);
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 1);
+
+		/* Disable PULL_UP_EN & enable MICBIAS */
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 2);
+		/* Program Button threshold registers as per MICBIAS */
+		wcd_program_btn_threshold(mbhc, true);
+#else
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 0);
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 3);
 		/* Program Button threshold registers as per CS */
 		wcd_program_btn_threshold(mbhc, false);
+#endif
 		break;
 	case WCD_MBHC_EN_MB:
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 0);
@@ -178,11 +199,21 @@ static void wcd_enable_curr_micbias(const struct wcd_mbhc *mbhc,
 		wcd_program_btn_threshold(mbhc, true);
 		break;
 	case WCD_MBHC_EN_PULLUP:
+#ifdef CONFIG_NUBIA_AUDIO
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 0);
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 1);
+
+		/* Disable PULL_UP_EN & enable MICBIAS */
+		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 2);
+		/* Program Button threshold registers as per MICBIAS */
+		wcd_program_btn_threshold(mbhc, true);
+#else
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 3);
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_FSM_EN, 1);
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MICB_CTRL, 1);
 		/* Program Button threshold registers as per MICBIAS */
 		wcd_program_btn_threshold(mbhc, true);
+#endif
 		break;
 	case WCD_MBHC_EN_NONE:
 		WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_ISRC_CTL, 0);
@@ -243,7 +274,12 @@ static int wcd_event_notify(struct notifier_block *self, unsigned long val,
 	bool micbias2 = false;
 	bool micbias1 = false;
 	u8 fsm_en;
-
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+       if(mbhc->current_plug == MBHC_PLUG_TYPE_NONE){
+                pr_err("%s, called when open speaker, do nothing",__func__);
+		return 0;
+       }
+#endif
 	pr_debug("%s: event %s (%d)\n", __func__,
 		 wcd_mbhc_get_event_string(event), event);
 	if (mbhc->mbhc_cb->micbias_enable_status) {
@@ -335,7 +371,7 @@ out_micb_en:
 
 		/* configure cap settings properly when micbias is disabled */
 		if (mbhc->mbhc_cb->set_cap_mode)
-			mbhc->mbhc_cb->set_cap_mode(codec, micbias1, false);
+			mbhc->mbhc_cb->set_cap_mode(codec, micbias1, true);
 		break;
 	case WCD_EVENT_PRE_HPHL_PA_OFF:
 		mutex_lock(&mbhc->hphl_pa_lock);
@@ -477,6 +513,25 @@ static void wcd_mbhc_clr_and_turnon_hph_padac(struct wcd_mbhc *mbhc)
 	}
 }
 
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+static bool wcd_mbhc_is_hpl_pa_on(struct wcd_mbhc *mbhc)
+{
+	bool hph_pa_on = false;
+
+	WCD_MBHC_REG_READ(WCD_MBHC_HPHL_PA_EN, hph_pa_on);
+
+	return (hph_pa_on) ? true : false;
+}
+
+static bool wcd_mbhc_is_hpr_pa_on(struct wcd_mbhc *mbhc)
+{
+	bool hph_pa_on = false;
+
+	WCD_MBHC_REG_READ(WCD_MBHC_HPHR_PA_EN, hph_pa_on);
+
+	return (hph_pa_on) ? true : false;
+}
+#else
 static bool wcd_mbhc_is_hph_pa_on(struct wcd_mbhc *mbhc)
 {
 	bool hph_pa_on = false;
@@ -485,6 +540,7 @@ static bool wcd_mbhc_is_hph_pa_on(struct wcd_mbhc *mbhc)
 
 	return (hph_pa_on) ? true : false;
 }
+#endif
 
 static void wcd_mbhc_set_and_turnoff_hph_padac(struct wcd_mbhc *mbhc)
 {
@@ -495,6 +551,23 @@ static void wcd_mbhc_set_and_turnoff_hph_padac(struct wcd_mbhc *mbhc)
 
 	/* If headphone PA is on, check if userspace receives
 	* removal event to sync-up PA's state */
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+       if (wcd_mbhc_is_hpl_pa_on(mbhc)) {
+		pr_info("%s PA is on, setting WCD_MBHC_HPHL_PA_OFF_ACK\n", __func__);
+		set_bit(WCD_MBHC_HPHL_PA_OFF_ACK, &mbhc->hph_pa_dac_state);
+	} else {
+		pr_debug("%s PA is off\n", __func__);
+	}
+	
+	if (wcd_mbhc_is_hpr_pa_on(mbhc)) {
+		AW87319_Audio_OFF();
+		pr_info("%s PA is on, setting WCD_MBHC_HPHR_PA_OFF_ACK\n", __func__);
+		set_bit(WCD_MBHC_HPHR_PA_OFF_ACK, &mbhc->hph_pa_dac_state);
+	} else {
+		pr_debug("%s PA is off\n", __func__);
+	}
+
+#else	
 	if (wcd_mbhc_is_hph_pa_on(mbhc)) {
 		pr_debug("%s PA is on, setting PA_OFF_ACK\n", __func__);
 		set_bit(WCD_MBHC_HPHL_PA_OFF_ACK, &mbhc->hph_pa_dac_state);
@@ -502,8 +575,10 @@ static void wcd_mbhc_set_and_turnoff_hph_padac(struct wcd_mbhc *mbhc)
 	} else {
 		pr_debug("%s PA is off\n", __func__);
 	}
-	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_HPH_PA_EN, 0);
-	usleep_range(wg_time * 1000, wg_time * 1000 + 50);
+#endif
+
+       WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_HPH_PA_EN, 0);
+	 usleep_range(wg_time * 1000, wg_time * 1000 + 50);
 }
 
 int wcd_mbhc_get_impedance(struct wcd_mbhc *mbhc, uint32_t *zl,
@@ -553,6 +628,10 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 
 	pr_debug("%s: enter insertion %d hph_status %x\n",
 		 __func__, insertion, mbhc->hph_status);
+#ifdef CONFIG_NUBIA_AUDIO
+	pr_info("%s:NUBIA AUDIO LOG,pls ignore it, insertion %d the jack type is %d\n",
+		 __func__, insertion, jack_type);
+#endif
 	if (!insertion) {
 		/* Report removal */
 		mbhc->hph_status &= ~jack_type;
@@ -589,7 +668,12 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 			 jack_type, mbhc->hph_status);
 		wcd_mbhc_jack_report(mbhc, &mbhc->headset_jack,
 				mbhc->hph_status, WCD_MBHC_JACK_MASK);
-		wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+          //wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+          //annotate turn off operation, in order to resolve no sound problem while unplug headset in voice speaker mode
+#else
+	      wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+#endif  //CONFIG_SND_SOC_AW87319_GENERIC
 		hphrocp_off_report(mbhc, SND_JACK_OC_HPHR);
 		hphlocp_off_report(mbhc, SND_JACK_OC_HPHL);
 		mbhc->current_plug = MBHC_PLUG_TYPE_NONE;
@@ -656,10 +740,15 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 			mbhc->current_plug = MBHC_PLUG_TYPE_HEADSET;
 			mbhc->jiffies_atreport = jiffies;
 		} else if (jack_type == SND_JACK_LINEOUT) {
+#ifdef CONFIG_NUBIA_AUDIO
+			mbhc->current_plug = MBHC_PLUG_TYPE_HEADSET;
+#else
 			mbhc->current_plug = MBHC_PLUG_TYPE_HIGH_HPH;
+#endif
 		} else if (jack_type == SND_JACK_ANC_HEADPHONE)
 			mbhc->current_plug = MBHC_PLUG_TYPE_ANC_HEADPHONE;
 
+#ifndef CONFIG_NUBIA_AUDIO
 		if (mbhc->impedance_detect &&
 			mbhc->mbhc_cb->compute_impedance &&
 			(mbhc->mbhc_cfg->linein_th != 0)) {
@@ -685,6 +774,7 @@ static void wcd_mbhc_report_plug(struct wcd_mbhc *mbhc, int insertion,
 				__func__);
 			}
 		}
+#endif
 
 		mbhc->hph_status |= jack_type;
 
@@ -1263,7 +1353,11 @@ correct_plug_type:
 					 */
 					pr_debug("%s: switch didnt work\n",
 						  __func__);
+#ifdef CONFIG_NUBIA_AUDIO
+					plug_type = MBHC_PLUG_TYPE_HEADSET;
+#else
 					plug_type = MBHC_PLUG_TYPE_GND_MIC_SWAP;
+#endif
 					goto report;
 				} else {
 					plug_type = MBHC_PLUG_TYPE_GND_MIC_SWAP;
@@ -1286,11 +1380,19 @@ correct_plug_type:
 				 * if switch is toggled, check again,
 				 * otherwise report unsupported plug
 				 */
-				if (mbhc->mbhc_cfg->swap_gnd_mic &&
-					mbhc->mbhc_cfg->swap_gnd_mic(codec)) {
+#ifdef CONFIG_NUBIA_AUDIO
+			if (mbhc->mbhc_cfg->msm_swap_set &&
+					mbhc->mbhc_cfg->msm_swap_set(codec,1,1)){
 					pr_debug("%s: US_EU gpio present,flip switch\n"
 						, __func__);
 					continue;
+#else
+				if (mbhc->mbhc_cfg->swap_gnd_mic &&
+				    mbhc->mbhc_cfg->swap_gnd_mic(codec)) {
+					pr_debug("%s: US_EU gpio present,flip switch\n"
+						, __func__);
+					continue;
+#endif
 				}
 			}
 		}
@@ -1352,7 +1454,10 @@ correct_plug_type:
 			goto report;
 		}
 	}
-
+#ifdef CONFIG_NUBIA_AUDIO
+	if (plug_type == MBHC_PLUG_TYPE_HIGH_HPH)
+		plug_type = MBHC_PLUG_TYPE_HEADSET;
+#endif
 report:
 	if (wcd_swch_level_remove(mbhc)) {
 		pr_debug("%s: Switch level is low\n", __func__);
@@ -1428,10 +1533,17 @@ static void wcd_mbhc_detect_plug_type(struct wcd_mbhc *mbhc)
 		pr_debug("%s: cross con found, start polling\n",
 			 __func__);
 		plug_type = MBHC_PLUG_TYPE_GND_MIC_SWAP;
+#ifdef CONFIG_NUBIA_AUDIO
+		if (mbhc->mbhc_cfg->msm_swap_set &&
+				mbhc->mbhc_cfg->msm_swap_set(codec,1,1))
+			pr_debug("%s:US_EU gpio present,flip switch\n"
+					, __func__);
+#else
 		if (!mbhc->current_plug)
 			mbhc->current_plug = plug_type;
 		pr_debug("%s: Plug found, plug type is %d\n",
 			 __func__, plug_type);
+#endif
 	}
 
 	/* Re-initialize button press completion object */
@@ -1446,8 +1558,8 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 	bool micbias1 = false;
 	struct snd_soc_codec *codec = mbhc->codec;
 
-	dev_dbg(codec->dev, "%s: enter\n", __func__);
 
+	dev_dbg(codec->dev, "%s: enter\n", __func__);
 	WCD_MBHC_RSC_LOCK(mbhc);
 
 	mbhc->in_swch_irq_handler = true;
@@ -1457,6 +1569,9 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 		pr_debug("%s: button press is canceled\n", __func__);
 
 	WCD_MBHC_REG_READ(WCD_MBHC_MECH_DETECTION_TYPE, detection_type);
+#ifdef CONFIG_NUBIA_AUDIO
+	pr_info("%s:NUBIA AUDIO LOG,pls ignore this log to enter irq,detection_type:%d\n", __func__,detection_type);
+#endif
 
 	/* Set the detection type appropriately */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_MECH_DETECTION_TYPE,
@@ -1472,6 +1587,16 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 
 	if ((mbhc->current_plug == MBHC_PLUG_TYPE_NONE) &&
 	    detection_type) {
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+	    pr_info("%s:  wcd_mbhc_set_and_turnoff_hpr_padac  enter\n", __func__);
+           wcd_mbhc_set_and_turnoff_hph_padac(mbhc);
+           pr_info("%s:  wcd_mbhc_set_and_turnoff_hpr_padac  exit\n", __func__);
+#endif
+#ifdef CONFIG_NUBIA_AUDIO
+		if (mbhc->mbhc_cfg->msm_swap_set)
+		mbhc->mbhc_cfg->msm_swap_set(codec,0,0);
+#endif
+
 		/* Make sure MASTER_BIAS_CTL is enabled */
 		mbhc->mbhc_cb->mbhc_bias(codec, true);
 
@@ -1554,6 +1679,11 @@ static void wcd_mbhc_swch_irq_handler(struct wcd_mbhc *mbhc)
 			WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_ELECT_SCHMT_ISRC, 0);
 			wcd_mbhc_report_plug(mbhc, 0, SND_JACK_ANC_HEADPHONE);
 		}
+#ifdef CONFIG_NUBIA_AUDIO
+		if (mbhc->mbhc_cfg->msm_swap_set)
+			mbhc->mbhc_cfg->msm_swap_set(codec,1,0);
+#endif
+
 	} else if (!detection_type) {
 		/* Disable external voltage source to micbias if present */
 		if (mbhc->mbhc_cb->enable_mb_source)
@@ -1593,6 +1723,9 @@ static int wcd_mbhc_get_button_mask(struct wcd_mbhc *mbhc)
 
 	btn = mbhc->mbhc_cb->map_btn_code_to_num(mbhc->codec);
 
+#ifdef CONFIG_NUBIA_AUDIO
+	pr_info("%s:NUBIA AUDIO LOG,pls ignore this log,the button is %d\n", __func__,btn);
+#endif
 	switch (btn) {
 	case 0:
 		mask = SND_JACK_BTN_0;
@@ -1839,6 +1972,10 @@ static void wcd_btn_lpress_fn(struct work_struct *work)
 		wcd_mbhc_jack_report(mbhc, &mbhc->button_jack,
 				mbhc->buttons_pressed, mbhc->buttons_pressed);
 	}
+#ifdef CONFIG_NUBIA_AUDIO
+		pr_info("%s: NUBIA AUDIO LOG,pls ignore it,just Reporting long button press event, btn_result: %d\n",
+			 __func__, btn_result);
+#endif
 	pr_debug("%s: leave\n", __func__);
 	mbhc->mbhc_cb->lock_sleep(mbhc, false);
 }
@@ -1906,11 +2043,19 @@ static irqreturn_t wcd_mbhc_btn_press_handler(int irq, void *data)
 	mask = wcd_mbhc_get_button_mask(mbhc);
 	mbhc->buttons_pressed |= mask;
 	mbhc->mbhc_cb->lock_sleep(mbhc, true);
+#ifdef CONFIG_NUBIA_AUDIO
+	if (schedule_delayed_work(&mbhc->mbhc_btn_dwork,
+				msecs_to_jiffies(800)) == 0) {
+		WARN(1, "Button pressed twice without release event\n");
+		mbhc->mbhc_cb->lock_sleep(mbhc, false);
+	}
+#else
 	if (schedule_delayed_work(&mbhc->mbhc_btn_dwork,
 				msecs_to_jiffies(400)) == 0) {
 		WARN(1, "Button pressed twice without release event\n");
 		mbhc->mbhc_cb->lock_sleep(mbhc, false);
 	}
+#endif
 done:
 	pr_debug("%s: leave\n", __func__);
 	WCD_MBHC_RSC_UNLOCK(mbhc);
@@ -2066,8 +2211,13 @@ static int wcd_mbhc_initialise(struct wcd_mbhc *mbhc)
 
 	/* Insertion debounce set to 96ms */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_INSREM_DBNC, 6);
+#ifdef CONFIG_NUBIA_AUDIO
+	/* Button Debounce set to 32ms ,default is 16ms */
+	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_DBNC, 3);
+#else
 	/* Button Debounce set to 16ms */
 	WCD_MBHC_REG_UPDATE_BITS(WCD_MBHC_BTN_DBNC, 2);
+#endif
 
 	/* Enable micbias ramp */
 	if (mbhc->mbhc_cb->mbhc_micb_ramp_control)

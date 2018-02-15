@@ -9,7 +9,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
 #include <linux/clk.h>
 #include <linux/delay.h>
 #include <linux/gpio.h>
@@ -33,6 +32,11 @@
 #include "../codecs/msm8x16-wcd.h"
 #include "../codecs/wsa881x-analog.h"
 #include <linux/regulator/consumer.h>
+
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+#include <../codecs/AW87319_Audio_M.h>
+#endif
+
 #define DRV_NAME "msm8952-asoc-wcd"
 
 #define BTSCO_RATE_8KHZ 8000
@@ -73,6 +77,9 @@ static atomic_t auxpcm_mi2s_clk_ref;
 static int msm8952_enable_dig_cdc_clk(struct snd_soc_codec *codec, int enable,
 					bool dapm);
 static bool msm8952_swap_gnd_mic(struct snd_soc_codec *codec);
+#ifdef CONFIG_NUBIA_AUDIO
+static bool msm_swap_set(struct snd_soc_codec *codec, int value1, int value2);
+#endif
 static int msm8952_mclk_event(struct snd_soc_dapm_widget *w,
 			      struct snd_kcontrol *kcontrol, int event);
 static int msm8952_wsa_switch_event(struct snd_soc_dapm_widget *w,
@@ -91,6 +98,16 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.mono_stero_detection = false,
 	.swap_gnd_mic = NULL,
 	.hs_ext_micbias = false,
+#ifdef CONFIG_NUBIA_AUDIO
+	.key_code[0] = KEY_MEDIA,
+	.key_code[1] = KEY_VOLUMEUP,
+	.key_code[2] = KEY_VOLUMEDOWN,
+	.key_code[3] = KEY_VOICECOMMAND,
+	.key_code[4] = 0,
+	.key_code[5] = 0,
+	.key_code[6] = 0,
+	.key_code[7] = 0,
+#else
 	.key_code[0] = KEY_MEDIA,
 	.key_code[1] = KEY_VOICECOMMAND,
 	.key_code[2] = KEY_VOLUMEUP,
@@ -99,6 +116,7 @@ static struct wcd_mbhc_config mbhc_cfg = {
 	.key_code[5] = 0,
 	.key_code[6] = 0,
 	.key_code[7] = 0,
+#endif
 	.linein_th = 5000,
 };
 
@@ -359,7 +377,17 @@ err:
 
 	return -EINVAL;
 }
-
+#ifdef CONFIG_SND_SOC_AW87319_GENERIC
+static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
+{
+  if (enable) {
+  	AW87319_Audio_Speaker();	 
+  	}else {
+  	AW87319_Audio_OFF();
+	}
+	return 0;
+}
+#else
 static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 {
 	struct snd_soc_card *card = codec->card;
@@ -400,6 +428,7 @@ static int enable_spk_ext_pa(struct snd_soc_codec *codec, int enable)
 	}
 	return 0;
 }
+#endif
 
 /* Validate whether US EU switch is present or not */
 int is_us_eu_switch_gpio_support(struct platform_device *pdev,
@@ -1693,6 +1722,18 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	 * 210-290 == Button 2
 	 * 360-680 == Button 3
 	 */
+#ifdef CONFIG_NUBIA_AUDIO
+	btn_low[0] = 100;
+	btn_high[0] = 100;
+	btn_low[1] = 240;
+	btn_high[1] = 240;
+	btn_low[2] = 437;
+	btn_high[2] = 437;
+	btn_low[3] = 437;
+	btn_high[3] = 437;
+	btn_low[4] = 437;
+	btn_high[4] = 437;
+#else
 	btn_low[0] = 75;
 	btn_high[0] = 75;
 	btn_low[1] = 150;
@@ -1703,7 +1744,7 @@ static void *def_msm8952_wcd_mbhc_cal(void)
 	btn_high[3] = 450;
 	btn_low[4] = 500;
 	btn_high[4] = 500;
-
+#endif
 	return msm8952_wcd_cal;
 }
 
@@ -2325,6 +2366,23 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.codec_name = "snd-soc-dummy",
 		.be_id = MSM_FRONTEND_DAI_VOICEMMODE2,
 	},
+#ifdef CONFIG_SND_SOC_TAS2555_GENERIC
+	{ /* hw:x,36 */
+		.name = "QUIN_MI2S Hostless",
+		.stream_name = "QUIN_MI2S Hostless",
+		.cpu_dai_name = "QUIN_MI2S_RX_HOSTLESS",
+		.platform_name = "msm-pcm-hostless",
+		.dynamic = 1,
+		.trigger = {SND_SOC_DPCM_TRIGGER_POST,
+			SND_SOC_DPCM_TRIGGER_POST},
+		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
+		.ignore_suspend = 1,
+		/* this dainlink has playback support */
+		.ignore_pmdown_time = 1,
+		.codec_dai_name = "snd-soc-dummy-dai",
+		.codec_name = "snd-soc-dummy",
+	},
+#endif
 	/* Backend I2S DAI Links */
 	{
 		.name = LPASS_BE_PRI_MI2S_RX,
@@ -2555,6 +2613,35 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.be_hw_params_fixup = msm_be_hw_params_fixup,
 		.ignore_suspend = 1,
 	},
+#ifdef CONFIG_SND_SOC_TAS2555_GENERIC
+	{
+		.name = LPASS_BE_QUIN_MI2S_RX,
+		.stream_name = "Quinary MI2S Playback",
+		.cpu_dai_name = "msm-dai-q6-mi2s.5",
+		.platform_name = "msm-pcm-routing",
+		.codec_dai_name = "tas2555 ASI1",
+		.codec_name = "tas2555.8-004c",
+		.no_pcm = 1,
+		.be_id = MSM_BACKEND_DAI_QUINARY_MI2S_RX,
+		.be_hw_params_fixup = msm_be_hw_params_fixup,
+		.ops = &msm8952_quin_mi2s_be_ops,
+		.ignore_pmdown_time = 1, /* dai link has playback support */
+		.ignore_suspend = 1,
+	},
+	{
+		.name = LPASS_BE_QUIN_MI2S_TX,
+		.stream_name = "Quinary MI2S Capture",
+		.cpu_dai_name = "msm-dai-q6-mi2s.5",
+		.platform_name = "msm-pcm-routing",
+		.codec_dai_name = "tas2555 ASI1",
+		.codec_name = "tas2555.8-004c",
+		.no_pcm = 1,
+		.be_id = MSM_BACKEND_DAI_QUINARY_MI2S_TX,
+		.be_hw_params_fixup = msm_be_hw_params_fixup,
+		.ops = &msm8952_quin_mi2s_be_ops,
+		.ignore_suspend = 1,
+	},
+#else
 	{
 		.name = LPASS_BE_QUIN_MI2S_RX,
 		.stream_name = "Quinary MI2S Playback",
@@ -2582,6 +2669,7 @@ static struct snd_soc_dai_link msm8952_dai[] = {
 		.ops = &msm8952_quin_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
+#endif
 };
 
 static int msm8952_wsa881x_init(struct snd_soc_dapm_context *dapm)
@@ -2700,6 +2788,82 @@ static bool msm8952_swap_gnd_mic(struct snd_soc_codec *codec)
 
 	return true;
 }
+#ifdef CONFIG_NUBIA_AUDIO
+int is_typec_headset_switch_support(struct platform_device *pdev,
+		struct msm8916_asoc_mach_data *pdata)
+{
+      int ret = 0;
+	pdata->swap_en0_gpio = of_get_named_gpio(pdev->dev.of_node,
+				"qcom,swap-en0-gpios", 0);
+	if (pdata->swap_en0_gpio < 0) {
+		dev_dbg(&pdev->dev,
+			"property %s in node %s not found %d\n",
+			"qcom,swap-en0-gpios", pdev->dev.of_node->full_name,
+			pdata->swap_en0_gpio);
+	} else {
+		if (!gpio_is_valid(pdata->swap_en0_gpio)) {
+			pr_err("%s: Invalid gpio: %d", __func__,
+					pdata->swap_en0_gpio);
+			return -EINVAL;
+		}
+	}
+	pdata->swap_en1_gpio = of_get_named_gpio(pdev->dev.of_node,
+				"qcom,swap-en1-gpios", 0);
+	if (pdata->swap_en1_gpio < 0) {
+		dev_dbg(&pdev->dev,
+			"property %s in node %s not found %d\n",
+			"qcom,swap-en1-gpios", pdev->dev.of_node->full_name,
+			pdata->swap_en1_gpio);
+	} else {
+		if (!gpio_is_valid(pdata->swap_en1_gpio)) {
+			pr_err("%s: Invalid gpio: %d", __func__,
+					pdata->swap_en1_gpio);
+			return -EINVAL;
+		}
+	}
+
+	ret = gpio_direction_output(pdata->swap_en0_gpio, 1);
+	if (ret) {
+		pr_err("%s: set swap_en0_gpio faided\n",__func__);
+		if (gpio_is_valid(pdata->swap_en0_gpio))
+			gpio_free(pdata->swap_en0_gpio);
+	}
+	ret = gpio_direction_output(pdata->swap_en1_gpio, 0);
+	if (ret) {
+		pr_err("%s: set swap_en1_gpio faided\n",__func__);
+		if (gpio_is_valid(pdata->swap_en1_gpio))
+			gpio_free(pdata->swap_en1_gpio);
+	}
+	mbhc_cfg.msm_swap_set = msm_swap_set;
+	return 0;
+}
+static bool msm_swap_set(struct snd_soc_codec *codec, int value1, int value2)
+{
+	struct snd_soc_card *card = codec->card;
+	struct msm8916_asoc_mach_data *pdata = snd_soc_card_get_drvdata(card);
+	int ret = 0;
+
+	dev_dbg(card->dev, "%s: set value1 is %d and value2 is %d", __func__, value1, value2);
+
+	if (gpio_is_valid(pdata->swap_en0_gpio)) {
+		ret = gpio_direction_output(pdata->swap_en0_gpio, value1);
+		if (ret) {
+			dev_dbg(card->dev, "%s: set swap_en0_gpio failed", __func__);
+		}
+		dev_dbg(card->dev, "%s: current swap_en0_gpio is %d\n", __func__, gpio_get_value(pdata->swap_en0_gpio));
+	}
+
+	if (gpio_is_valid(pdata->swap_en1_gpio)) {
+		ret = gpio_direction_output(pdata->swap_en1_gpio, value2);
+		if (ret) {
+			dev_dbg(card->dev, "%s: set swap_en1_gpio failed", __func__);
+		}
+		dev_dbg(card->dev, "%s: current swap_en1_gpio is %d\n", __func__, gpio_get_value(pdata->swap_en1_gpio));
+	}
+
+	return true;
+}
+#endif
 
 static void msm8952_dt_parse_cap_info(struct platform_device *pdev,
 		struct msm8916_asoc_mach_data *pdata)
@@ -3097,6 +3261,15 @@ static int msm8952_asoc_machine_probe(struct platform_device *pdev)
 				__func__, ret);
 		goto err;
 	}
+
+#ifdef CONFIG_NUBIA_AUDIO
+    ret = is_typec_headset_switch_support(pdev, pdata);
+	if (ret < 0) {
+		pr_err("%s: failed to is_typec_headset_switch_support %d\n",
+				__func__, ret);
+		goto err;
+	}
+#endif
 
 	ret = is_ext_spk_gpio_support(pdev, pdata);
 	if (ret < 0)

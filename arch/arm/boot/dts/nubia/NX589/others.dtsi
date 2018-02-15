@@ -1,0 +1,93 @@
+/*
+ * nubia overwrite dts
+\ */
+&spmi_bus {
+        qcom,pm8950@0 {
+               qcom,power-on@800 {
+                       qcom,pon_1 {
+                                qcom,support-reset = <1>;
+                                qcom,s1-timer = <10256>;
+                                qcom,s2-timer = <2000>;
+                                qcom,s2-type = <7>;
+                        };
+                };
+        };
+
+	pm8998_rtc: qcom,pm8998_rtc {
+               qcom,qpnp-rtc-alarm-pwrup = <1>;
+	};
+};
+
+//pinctrl for AW87319
+&tlmm_pinmux{
+
+	nubia_aw87319_rst_high {
+		qcom,pins = <&gp 126>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_aw87319_rst_high";
+
+		aw87319_rst_high: aw87319_rst_high {
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	nubia_aw87319_rst_low {
+		qcom,pins = <&gp 126>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_aw87319_rst_low";
+
+		aw87319_rst_low: aw87319_rst_low {
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};
+
+/*added by wangrutiao for aw87319 --begin*/
+&i2c_8{
+   aw87319_pa@58{
+       compatible = "awinic,aw87319_pa";
+       reg = <0x58>;
+       awinic,ext_pa_spk_aw87319_rst = <&msm_gpio 126 0x01>;
+       pinctrl-names = "aw87319_pa_active","aw87319_pa_off";
+       pinctrl-0 = <&aw87319_rst_high>;
+       pinctrl-1 = <&aw87319_rst_low>;
+     };
+};
+/*added by wangruitao for 87319 --end*/
+&soc {
+	qcom,bcl {
+		qcom,ibat-monitor {
+			qcom,soc-low-threshold = <5>;
+		};
+	};
+	qcom,wdt@b017000 {
+		qcom,bark-time = <20000>;
+		qcom,pet-time = <15000>;
+	};
+};
+/ {
+        memory {
+               pstore_reserve_mem: pstore_reserve_mem_region@0 {
+                        linux,reserve-contiguous-region;
+                        linux,reserve-region;
+                        linux,remove-completely;
+                        reg = <0x0 0x9ff00000 0x0 0x00100000>;
+                        label = "pstore_reserve_mem";
+                };
+	};
+};
+
+/* keyreset feature */
+&soc {
+	keyreset {
+		compatible = "nubia,keyreset";
+		keys-down = <0x73 0x72>;
+		keys-up = <0x73 0x72>;
+		keyreset-need-panic;
+		key_down_delay = <20>;
+	};
+};

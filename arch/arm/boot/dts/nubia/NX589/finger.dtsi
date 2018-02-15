@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+&soc {
+		/* used for fingerprint device as platform device added by nubia start*/
+	gf5216m {
+		status = "ok";
+		compatible = "goodix,fingerprint";
+/*goodix origin start*/
+		input-device-name = "gf5216m";
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <33 0>;
+		goodix,gpio_rst = <&msm_gpio 51 0x00>;
+		goodix,gpio_int = <&msm_gpio 33 0x00>;
+		goodix,gpio_pwr = <&msm_gpio 112 0x00>;
+		pinctrl-names = "goodixfp_reset_reset", "goodixfp_reset_active", "goodixfp_irq_active";
+		pinctrl-0 = <&gf_pwr_active &gf_rst_suspend>;
+		pinctrl-1 = <&gf_pwr_active &gf_rst_active>;
+		pinctrl-2 = <&gf_pwr_active &gf_int_active>;
+/*goodix origin end*/
+	};
+	/* used for fingerprint device as platform device added by nubia end*/
+};
+
+/*****finger pinctrl start *****/
+&soc{
+tlmm_pinmux: pinctrl@1000000{
+	gf_pwr_gpio: gf_pwr_gpio {
+		  label = "gf_pwr_gpio";
+		  qcom,pins = <&gp 112>;
+		  qcom,num-grp-pins = <1>;
+		  qcom,pin-func = <0>;
+		  gf_pwr_active: gf_pwr_active {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+		  gf_pwr_suspend: gf_pwr_suspend {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+	};
+	gf_int_gpio: gf_int_gpio {
+		  label = "gf_int_gpio";
+		  qcom,pins = <&gp 33>;
+		  qcom,num-grp-pins = <1>;
+		  qcom,pin-func = <0>;
+		  gf_int_active: gf_int_active {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+		  gf_int_suspend: gf_int_suspend {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+	};
+	gf_rst_gpio: gf_rst_gpio {
+		  label = "gf_rst_gpio";
+		  qcom,pins = <&gp 51>;
+		  qcom,num-grp-pins = <1>;
+		  qcom,pin-func = <0>;
+		  gf_rst_active: gf_rst_active {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+		  gf_rst_suspend: gf_rst_suspend {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+	};
+ };
+};
+
+/*****finger memory changed *****/
+/*&memory{*/
+&other_ext_mem{
+	reg = <0x0 0x84a00000 0x0 0x1e00000>;
+};
+&cont_splash_mem{
+	reg = <0x0 0x8de00000 0x0 0x2800000>;
+};
+&qcom_seecom{
+	reg = <0x84a00000 0x1900000>;
+};

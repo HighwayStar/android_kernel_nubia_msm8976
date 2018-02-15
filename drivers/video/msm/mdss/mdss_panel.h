@@ -563,7 +563,9 @@ struct mdss_panel_info {
 	struct ion_handle *splash_ihdl;
 	int panel_power_state;
 	int compression_mode;
-
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+	uint32_t backlight_curve[256];
+#endif
 	uint32_t panel_dead;
 	u32 panel_force_dead;
 	u32 panel_orientation;
@@ -580,6 +582,9 @@ struct mdss_panel_info {
 	void *cec_data;
 
 	char panel_name[MDSS_MAX_PANEL_LEN];
+	/*dimming*/
+	bool disable_dimming_when_suspend;
+	bool disable_dimming_when_resume;
 	struct mdss_mdp_pp_tear_check te;
 
 	struct dsc_desc dsc;

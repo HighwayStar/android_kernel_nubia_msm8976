@@ -214,6 +214,10 @@ struct msm8916_asoc_mach_data {
 	int codec_type;
 	int ext_pa;
 	int us_euro_gpio;
+#ifdef CONFIG_NUBIA_AUDIO
+	int swap_en0_gpio;
+	int swap_en1_gpio;
+#endif
 	int spk_ext_pa_gpio;
 	int ext_audio_switch_gpio;
 	u32 ext_audio_switch_active_high;

@@ -937,6 +937,20 @@ int diag_process_apps_pkt(unsigned char *buf, int len)
 		/* Not required, represents that command isnt sent to modem */
 		return 0;
 	}
+#ifdef CONFIG_NUBIA_DIAG_REBOOT_CMD
+	/* Check for reboot command */
+	else if (chk_apps_master() && (*buf == 0x29) && (*(buf+1) == 0x02) && (*(buf+2) == 0x00)) {
+		/* send response back */
+		//driver->apps_rsp_buf[0] = *buf;
+		memcpy(driver->apps_rsp_buf,buf,3);
+		diag_send_rsp(driver->apps_rsp_buf, 1);
+		msleep(5000);
+		printk(KERN_CRIT "diag: reboot set, Rebooting SoC..\n");
+		kernel_restart(NULL);
+		/* Not required, represents that command isnt sent to modem */
+		return 0;
+	}
+#endif
 	/* Check for polling for Apps only DIAG */
 	else if ((*buf == 0x4b) && (*(buf+1) == 0x32) &&
 		(*(buf+2) == 0x03)) {

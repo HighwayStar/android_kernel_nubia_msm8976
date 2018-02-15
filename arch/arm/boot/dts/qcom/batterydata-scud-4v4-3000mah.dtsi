@@ -1,0 +1,68 @@
+/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+//zte_nx591j_3200mah_averaged_masterslave_feb21st2017
+
+qcom,scud_3200mah  {
+	qcom,fcc-mah = <3200>;
+	qcom,nom-batt-capacity-mah = <3200>;
+	qcom,default-rbatt-mohm = <128>;
+	qcom,max-voltage-uv = <4400000>;
+	qcom,rbatt-capacitive-mohm = <50>;
+	qcom,v-cutoff-uv = <3400000>;
+	qcom,chg-term-ua = <100000>;
+	qcom,batt-id-kohm = <180>;
+	qcom,battery-beta = <3435>;
+	qcom,chg-rslow-comp-c1 = <3419232>;
+	qcom,chg-rslow-comp-c2 = <5295127>;
+	qcom,chg-rs-to-rslow = <1675668>;
+	qcom,chg-rslow-comp-thr = <0xAC>;
+	qcom,checksum = <0x572B>;
+	qcom,gui-version = "PMI8950GUI - 2.0.0.16";
+	qcom,battery-type = "scud_3200mah";
+
+	qcom,fg-profile-data = [
+		 EF 83 57 7D
+		 6C 81 D9 77
+		 55 83 A4 4A
+		 D6 80 3C 8C
+		 1F 82 A9 99
+		 51 BC 72 C8
+		 5B 11 09 88
+		 33 7E F4 81
+		 5D 7C 4C 83
+		 5F 71 05 5C
+		 3E 7E 5F 82
+		 05 99 15 BC
+		 72 C8 58 0C
+		 82 0C 9E 59
+		 14 70 71 FD
+		 24 3E 7E 47
+		 3F 41 00 00
+		 BB 46 F1 32
+		 5F 28 00 00
+		 00 00 00 00
+		 00 00 00 00
+		 CF 71 EA 70
+		 85 71 72 88
+		 6B 74 9B 52
+		 36 60 21 80
+		 B5 6F 08 4A
+		 8B 66 55 AB
+		 1A D0 63 74
+		 66 A0 71 0C
+		 28 00 FF 36
+		 F0 11 30 03
+		 00 00 00 0C
+	];
+};
+

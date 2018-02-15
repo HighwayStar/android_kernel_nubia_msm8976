@@ -225,10 +225,22 @@ struct msm_mdp_interface {
 };
 
 #define IS_CALIB_MODE_BL(mfd) (((mfd)->calib_mode) & MDSS_CALIB_MODE_BL)
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+int nubia_backlight_covert(struct msm_fb_data_type *mfd,
+					int value);
+#endif
+
+#ifdef CONFIG_NUBIA_DISPLAY_INFINITE_TUNING
+#define MDSS_BRIGHT_TO_BL(out, v, bl_max, max_bright) do {\
+					out = (2 * (v) * (v) + max_bright)\
+					/ (2 * max_bright);\
+					} while (0)
+#else
 #define MDSS_BRIGHT_TO_BL(out, v, bl_max, max_bright) do {\
 					out = (2 * (v) * (bl_max) + max_bright)\
 					/ (2 * max_bright);\
 					} while (0)
+#endif
 
 struct mdss_fb_file_info {
 	struct file *file;

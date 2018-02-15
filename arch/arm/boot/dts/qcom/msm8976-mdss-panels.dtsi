@@ -55,7 +55,7 @@
 			qcom,supply-enable-load = <100000>;
 			qcom,supply-disable-load = <100>;
 		};
-
+/*
 		qcom,panel-supply-entry@3 {
 			reg = <3>;
 			qcom,supply-name = "ibb";
@@ -65,5 +65,6 @@
 			qcom,supply-disable-load = <100>;
 			qcom,supply-post-on-sleep = <20>;
 		};
+*/
 	};
 };

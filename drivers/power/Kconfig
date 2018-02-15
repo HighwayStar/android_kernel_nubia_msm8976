@@ -575,6 +575,55 @@ config MSM_BCL_PERIPHERAL_CTL
 	  provides routines to configure and monitor the BCL
 	  PMIC peripheral.
 
+config NUBIA_CHARGE_FEATURE
+	bool "nubia charge feature support"
+	default n
+	help
+		Say Y here to enable support nubia charge feature and drivers.
+
+################nubia hw_version config start################
+config NUBIA_HW_VERSION
+	bool "NUBIA HW VERSION"
+	default n
+	help
+	  NUBIA HW VERSION
+
+config NUBIA_HW_VERSION_DEBUG
+	bool "NUBIA HW VERSION DEBUG"
+	depends on NUBIA_HW_VERSION
+	default n
+	help
+	  NUBIA HW VERSION DEBUG
+
+config NUBIA_HW_VER_BY_ADC
+	bool "NUBIA HW VER BY ADC"
+	depends on NUBIA_HW_VERSION
+	default n
+	help
+	  NUBIA HW VER BY ADC
+
+config NUBIA_HW_CONFIG_BY_GPIO
+	bool "NUBIA HW CONFIG BY GPIO"
+	depends on NUBIA_HW_VERSION
+	default n
+	help
+	  NUBIA HW CONFIG BY GPIO
+
+config NUBIA_HW_CPU_SERIAL_NUM
+	bool "NUBIA HW CPU SERIAL NUM"
+	depends on NUBIA_HW_VERSION
+	default y
+	help
+	  NUBIA HW CPU SERIAL NUM
+
+config NUBIA_HW_CPU_SERIAL_NUM_MSM8952
+	bool "NUBIA_HW_CPU_SERIAL_NUM_MSM8952"
+	depends on NUBIA_HW_CPU_SERIAL_NUM
+	default n
+	help
+	  NUBIA HW CPU SERIAL NUM MSM8952
+
+################nubia hw_version config end#################
 source "drivers/power/reset/Kconfig"
 
 endif # POWER_SUPPLY

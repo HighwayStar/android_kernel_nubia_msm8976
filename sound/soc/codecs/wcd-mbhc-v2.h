@@ -249,6 +249,9 @@ struct wcd_mbhc_config {
 	bool detect_extn_cable;
 	bool mono_stero_detection;
 	bool (*swap_gnd_mic) (struct snd_soc_codec *codec);
+#ifdef CONFIG_NUBIA_AUDIO
+    bool (*msm_swap_set)(struct snd_soc_codec *codec, int value1, int value2);
+#endif
 	bool hs_ext_micbias;
 	bool gnd_det_en;
 	int key_code[WCD_MBHC_KEYCODE_NUM];

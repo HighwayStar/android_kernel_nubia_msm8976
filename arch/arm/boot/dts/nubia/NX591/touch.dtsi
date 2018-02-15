@@ -1,0 +1,151 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+
+/*
+ * ADD synaptics touch
+ */
+
+&i2c_4 {
+    status = "okay";
+};
+
+&i2c_4 {
+	synaptics@20 {
+	       status = "disabled"; /* nubia diable default touchpad */
+	};
+       synaptics_dsx@20 {
+                compatible = "synaptics,dsx-i2c";
+                reg = <0x20>;
+                interrupt-parent = <&msm_gpio>;
+                interrupts = <65 0x2008>;
+                //vdd_ana-supply = <&pm8953_l10>;
+                vcc_i2c-supply = <&pm8950_l22>;
+                //synaptics,pwr-reg-name = "vdd_ana";
+                synaptics,bus-reg-name = "vcc_i2c";
+                synaptics,irq-gpio = <&msm_gpio 65 0x2008>;
+                synaptics,irq-on-state = <0>;
+                synaptics,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+                synaptics,power-delay-ms = <20>;
+                synaptics,power-gpio = <&msm_gpio 69 0x0>;
+                synaptics,power-on-state = <1>;
+                synaptics,reset-gpio = <&msm_gpio 64 0x0>;
+                synaptics,reset-on-state = <0>;
+                synaptics,reset-active-ms = <20>;
+                synaptics,reset-delay-ms = <20>;
+
+                synaptics,virkeynum = <3>;
+                synaptics,key-isfactory = <1>;    //enable factory key
+
+                synaptics,virkeyrange = <40>;
+                synaptics,keylooptime = <150>;
+                synaptics,key0name  = "HOME";
+                synaptics,key0minval = <1000>;
+                synaptics,key0maxval = <1600>;
+                synaptics,key0mincap = <70>;
+                synaptics,key0maxcap = <160>;
+
+                synaptics,key1name = "MENU";
+                synaptics,key1minval = <1100>;
+                synaptics,key1maxval = <1700>;
+                synaptics,key1mincap = <70>;
+                synaptics,key1maxcap = <160>;
+
+                synaptics,key2name = "BACK";
+                synaptics,key2minval = <1700>;
+                synaptics,key2maxval = <2300>;
+                synaptics,key2mincap = <100>;
+                synaptics,key2maxcap = <190>;
+
+                synaptics,lcd-reset-gpio = <&msm_gpio 25 0x0>;
+                synaptics,cap-button-codes = <172 139 158>;
+                pinctrl-names = "synaptics_pin_active", "synaptics_pin_suspend";
+                pinctrl-0 = <&synaptics_int_active &synaptics_reset_active &synaptics_power_active>;
+                pinctrl-1 = <&synaptics_int_suspend &synaptics_reset_suspend &synaptics_power_suspend>;
+        };
+};
+&tlmm_pinmux{
+		//nubia touch screen pinctrl
+                nubia_ts_int_active {
+                        qcom,pins = <&gp 65>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_int_active";
+
+                        synaptics_int_active: synaptics_int_active {
+                                drive-strength = <8>;
+                                bias-pull-up;
+                        };
+                };
+
+                nubia_ts_int_suspend {
+                        qcom,pins = <&gp 65>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_int_suspend";
+
+                        synaptics_int_suspend: synaptics_int_suspend {
+                                drive-strength = <2>;
+                                bias-pull-down;
+                        };
+                };
+
+                nubia_ts_reset_active {
+                        qcom,pins = <&gp 64>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_reset_active";
+
+                        synaptics_reset_active: synaptics_reset_active {
+                                drive-strength = <8>;
+                                bias-pull-up;
+                        };
+                };
+
+                nubia_ts_reset_suspend {
+                        qcom,pins = <&gp 64>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_reset_suspend";
+
+                        synaptics_reset_suspend: synaptics_reset_suspend {
+                                drive-strength = <2>;
+                                bias-pull-down;
+                        };
+                };
+
+                nubia_ts_power_active {
+                        qcom,pins = <&gp 69>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_power_active";
+
+                        synaptics_power_active: synaptics_power_active {
+                                drive-strength = <8>;
+                                bias-pull-up;
+                        };
+                };
+
+                nubia_ts_power_suspend {
+                        qcom,pins = <&gp 69>;
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "nubia_ts_power_suspend";
+
+                        synaptics_power_suspend: synaptics_power_suspend {
+                                drive-strength = <2>;
+                                bias-pull-down;
+                        };
+                };
+		//nubia end
+};

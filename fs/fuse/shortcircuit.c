@@ -59,10 +59,12 @@ static ssize_t fuse_shortcircuit_aio_read_write(struct kiocb *iocb,
 	struct fuse_file *ff;
 	struct file *fuse_file, *lower_file;
 	struct inode *fuse_inode, *lower_inode;
+	struct fuse_conn *fc;
 
 	ff = iocb->ki_filp->private_data;
 	fuse_file = iocb->ki_filp;
 	lower_file = ff->rw_lower_file;
+	fc = ff->fc;
 
 	/* lock lower file to prevent it from being released */
 	get_file(lower_file);
@@ -77,7 +79,15 @@ static ssize_t fuse_shortcircuit_aio_read_write(struct kiocb *iocb,
 		ret_val = lower_file->f_op->aio_write(iocb, iov, nr_segs, pos);
 
 		if (ret_val >= 0 || ret_val == -EIOCBQUEUED) {
+			// nubia add
+			struct fuse_inode *fi = get_fuse_inode(fuse_inode);
+			// nubia add end
 			fsstack_copy_inode_size(fuse_inode, lower_inode);
+			// nubia add
+			spin_lock(&fc->lock);
+			fi->attr_version = ++fc->attr_version;
+			spin_unlock(&fc->lock);
+			// nubia add end
 			fsstack_copy_attr_times(fuse_inode, lower_inode);
 		}
 	} else {

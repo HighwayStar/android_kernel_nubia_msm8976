@@ -2707,6 +2707,12 @@ static void msm_otg_chg_check_timer_func(unsigned long data)
 		return;
 	}
 
+	#ifdef CONFIG_NUBIA_CHARGE_FEATURE
+	//ZTEMT add, support floated charger, fix current 900mA
+	pr_err("NBDB floated charger is detected as SDP\n");
+	msm_otg_notify_charger(motg, 900);
+	#endif
+
 	if ((readl_relaxed(USB_PORTSC) & PORTSC_LS) == PORTSC_LS) {
 		dev_dbg(otg->phy->dev, "DCP is detected as SDP\n");
 		msm_otg_dbg_log_event(&motg->phy, "DCP IS DETECTED AS SDP",

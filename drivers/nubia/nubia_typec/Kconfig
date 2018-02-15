@@ -1,0 +1,25 @@
+menu "NUBIA_TYPEC_CHIP"
+config NUBIA_TYPEC_FUSB301
+	tristate "Integrated Circuits FAIRCHILD USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config NUBIA_TYPEC_PTN5150
+	tristate "Integrated Circuits NXP USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config NUBIA_TYPEC_TUSB320
+	tristate "Integrated Circuits TI USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config NUBIA_TYPEC_PI5U
+	tristate "Integrated Circuits PERICOM USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+endmenu

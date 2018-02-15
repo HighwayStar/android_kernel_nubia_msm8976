@@ -1,0 +1,176 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+
+/*
+ * Add nubia sensors
+ */
+&i2c_6 {
+	rohm@38 {
+		compatible = "rohm,bh1745";
+		reg = <0x38>;
+		vdd-supply = <&pm8950_l10>;
+		vio-supply = <&pm8950_l5>;
+		bh1745,tp_moudle_count = <3>;
+		/*[module_id] [golden judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		bh1745,cal_data0 = "0","174","635","441","2686","2392","0","0",
+		/*[white judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"195","188","133","596","481","0","0",
+		/*[balck judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"417","988","481","5486","5450","0","0";
+		/*[module_id] [golden judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		bh1745,cal_data1 = "1","242","1565","932","9035","8607","0","0",
+		/*[white judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"189","146","88","598","533","0","0",
+		/*[balck judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"1040","1911","310","11509","9976","0","0";
+		/*[module_id] [golden judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		bh1745,cal_data2 = "2","199","488","274","2283","2068","0","0",
+		/*[white judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"194","216","113","886","821","0","0",
+		/*[balck judge] r[0] r[1] g[0] g[1] b[0] b[1]*/
+		"396","2301","547","13243","12687","0","0";
+	};
+	txc@1e {
+		compatible = "txc,pa224";
+		reg = <0x1e>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <140 0x2>;
+		vdd-supply = <&pm8950_l10>;
+		vio-supply = <&pm8950_l5>;
+		txc,irq-gpio = <&msm_gpio 140 0x2002>;
+		txc,ps_threshold_low = <30>;
+		txc,ps_threshold_high = <120>;
+		txc,vdd-always-on = <1>;
+		pinctrl-names = "pa224_default","pa224_sleep";
+		pinctrl-0 = <&pa224_default>;
+		pinctrl-1 =<&pa224_sleep>;
+	};
+	aw2013_led@45 {
+		aw2013_led,name = "aw2013";
+		compatible = "aw2013";
+		vdd_ana-supply = <&pm8950_l10>;
+		vcc_i2c-supply = <&pm8950_l5>;
+		/*For adjust the brightness range,values range form 1 to 5.*/
+		middle_grade_percentage = <300>;
+		side_grade_percentage = <60>;
+		grade_scale-offset = <0>;
+		blink_max_grade = <255>;
+		onceblink_fade_time = <1>;
+		onceblink_fullon_time= <0>;
+		onceblink_fulloff_time= <0>;
+		autoblink_fade_time= <4>;
+		autoblink_fullon_time= <2>;
+		autoblink_fulloff_time= <2>;
+		max_current = <0x01>;
+		reg = <0x45>;
+	};
+	ti@5a{
+		compatible = "ti,drv2605";
+		reg = <0x5a>;
+		pinctrl-names = "active","suspend";
+		pinctrl-0 = <&drv2605_power_active>;
+		pinctrl-1 = <&drv2605_power_suspend>;
+		ti,enable-gpio=<&tlmm_pinmux 102 0x0>;
+	};
+};
+
+&soc {
+	hall_device_out {
+		compatible = "nubia,hall_device";
+		status = "okay";
+		hall_device,hw_device_count = <1>;
+		vio-supply = <&pm8950_l5>;
+		interrupt-parent = <&msm_gpio>;
+		hall_device,irq-gpio-0 = <&msm_gpio 144 0x2002>;
+		pinctrl-names = "hall_int_0_default","hall_int_0_sleep";
+		pinctrl-0 = <&hall_int_0_default>;
+		pinctrl-1 = <&hall_int_0_sleep>;
+	};
+};
+
+&tlmm_pinmux {
+	pa224_int_pin {
+		qcom,pins = <&gp 140>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "pa224-irq";
+		pa224_default: pa224_default {
+			driver-strength = <6>;
+			bias-pull-up;
+		};
+		pa224_sleep: pa224_sleep {
+			bias-high-impedance;
+		};
+	};
+	hall_int_0_pin {
+		qcom,pins = <&gp 144>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "hall_int_0-irq";
+		hall_int_0_default: hall_int_0_default {
+			drive-strength = <6>;
+			bias-pull-up;
+		};
+		hall_int_0_sleep: hall_int_0_sleep {
+			drive-strength = <2>;
+			bias-pull-up;
+		};
+	};
+	drv2605_power_pin{
+		/*qcom,pins = <&gp 102>;*/
+		pins = "gpio102";
+		qcom,num-grp-pins = <1>;
+		qcom,pin-func = <0>;
+		label = "drv2605_power_pin";
+		drv2605_power_active: active {
+			drive-strength = <6>;
+			bias-pull-up;
+			output-high;
+		};
+		drv2605_power_suspend: suspend {
+			drive-strength = <6>;
+			bias-pull-down;
+			output-low;
+		};
+	};
+
+};
+
+&pmi8950_haptic{
+	status = "ok";
+	compatible = "qcom,qpnp-haptic";
+	reg = <0xc000 0x100>;
+	interrupts = <0x3 0xc0 0x0>,
+			<0x3 0xc0 0x1>;
+	interrupt-names = "sc-irq", "play-irq";
+	qcom,play-mode = "direct";
+	qcom,wave-play-rate-us = <4255>;
+	qcom,actuator-type = "lra";
+	qcom,wave-shape = "sine";
+	qcom,vmax-mv = <1500>;
+	qcom,ilim-ma = <800>;
+	qcom,sc-deb-cycles = <8>;
+	qcom,int-pwm-freq-khz = <505>;
+	qcom,en-brake;
+	qcom,brake-pattern = [03 03 03 03];
+	qcom,use-play-irq;
+	qcom,use-sc-irq;
+	qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
+	qcom,wave-rep-cnt = <1>;
+	qcom,wave-samp-rep-cnt = <1>;
+	qcom,lra-high-z = "none";
+	qcom,lra-auto-res-mode = "none";
+	qcom,lra-res-cal-period = <4>;
+	qcom,ztemt_vibrator_ms = <40>;
+};

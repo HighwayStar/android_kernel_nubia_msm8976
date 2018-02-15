@@ -67,6 +67,14 @@ config USB
 	  To compile this driver as a module, choose M here: the
 	  module will be called usbcore.
 
+config NUBIA_USB_CDROM
+	boolean "Support for Nubia USB CDROM"
+	depends on USB
+	default y
+	help
+	  Say Y here if you need to modify USB related code for ZTEMT projects,
+	  and remember to use CONFIG_ZTEMT_USB to mark your code.
+
 if USB
 
 source "drivers/usb/core/Kconfig"

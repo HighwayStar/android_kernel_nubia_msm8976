@@ -48,6 +48,12 @@
 #include <linux/kthread.h>
 #include <linux/input.h>
 
+#include "nubia_disp_preference.h"
+
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+#include "mdss_dsi.h"
+#endif
+
 #include <linux/qcom_iommu.h>
 #include <linux/msm_iommu_domains.h>
 
@@ -120,12 +126,21 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 				      enum led_brightness value)
 {
 	struct msm_fb_data_type *mfd = dev_get_drvdata(led_cdev->dev->parent);
+	struct mdss_panel_data *pdata = dev_get_platdata(&mfd->pdev->dev);
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+				panel_data);
 	int bl_lvl;
+
+	int value_tmp;
+	value_tmp = value;
 
 	if (mfd->boot_notification_led) {
 		led_trigger_event(mfd->boot_notification_led, 0);
 		mfd->boot_notification_led = NULL;
 	}
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+	bl_lvl = nubia_backlight_covert(mfd,value);
+#else
 
 	if (value > mfd->panel_info->brightness_max)
 		value = mfd->panel_info->brightness_max;
@@ -134,7 +149,7 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	   driver backlight level 0 to bl_max with rounding */
 	MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
 				mfd->panel_info->brightness_max);
-
+#endif
 	if (!bl_lvl && value)
 		bl_lvl = 1;
 
@@ -144,6 +159,12 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 		mdss_fb_set_backlight(mfd, bl_lvl);
 		mutex_unlock(&mfd->bl_lock);
 	}
+
+	if(ctrl_pdata->nubia_mdss_dsi_cabc_low_bl > 0)
+	{
+		brightness_cabc_set(value_tmp);
+	}
+
 }
 
 static struct led_classdev backlight_led = {
@@ -919,10 +940,41 @@ static int mdss_fb_init_panel_modes(struct msm_fb_data_type *mfd,
 	return 0;
 }
 
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+int nubia_backlight_covert(struct msm_fb_data_type *mfd,
+                                      int value)
+{
+        u32 bl_lvl;
+
+        if(!mfd){
+                return -EINVAL;
+        }
+
+        pr_debug("before nubia backlight, value = %d\n",value);
+        if(mfd->panel_info->backlight_curve[0] == 0 && value<256 && value>=0 \
+                && backlight_led.max_brightness < 256){
+                bl_lvl = mfd->panel_info->backlight_curve[value];
+        }else{
+                if(value > 0){
+                        bl_lvl =value * (mfd->panel_info->bl_max -mfd->panel_info->bl_min);
+                        do_div(bl_lvl,backlight_led.max_brightness);
+                        bl_lvl =value *bl_lvl;
+                        do_div(bl_lvl,backlight_led.max_brightness);
+                        bl_lvl += mfd->panel_info->bl_min;
+                }else{
+                        bl_lvl =0;
+                }
+        }
+        pr_debug("after nubia backlight, value = %d\n",bl_lvl);
+        return bl_lvl;
+}
+#endif
+
 static int mdss_fb_probe(struct platform_device *pdev)
 {
 	struct msm_fb_data_type *mfd = NULL;
 	struct mdss_panel_data *pdata;
+	struct mdss_dsi_ctrl_pdata *ctrl_pdata = NULL;
 	struct fb_info *fbi;
 	const char *data;
 	int rc;
@@ -934,6 +986,10 @@ static int mdss_fb_probe(struct platform_device *pdev)
 	pdata = dev_get_platdata(&pdev->dev);
 	if (!pdata)
 		return -EPROBE_DEFER;
+	ctrl_pdata = container_of(pdata, struct mdss_dsi_ctrl_pdata,
+                               panel_data);
+	if (!ctrl_pdata)
+                return -EPROBE_DEFER;
 
 	of_property_read_u32(pdev->dev.of_node, "cell-index", &cell_index);
 	if (cell_index > fbi_list_index)
@@ -960,10 +1016,15 @@ static int mdss_fb_probe(struct platform_device *pdev)
 	mfd->mdp_fb_page_protection = MDP_FB_PAGE_PROTECTION_WRITECOMBINE;
 
 	mfd->ext_ad_ctrl = -1;
+
 	if (mfd->panel_info && mfd->panel_info->brightness_max > 0)
+#ifdef CONFIG_NUBIA_LCD_BACKLIGHT_CURVE
+		mfd->bl_level = nubia_backlight_covert(mfd,backlight_led.brightness);
+#else
 		MDSS_BRIGHT_TO_BL(mfd->bl_level,
 			backlight_led.brightness, mfd->panel_info->bl_max,
 					mfd->panel_info->brightness_max);
+#endif
 	else
 		mfd->bl_level = 0;
 
@@ -1364,6 +1425,10 @@ static void mdss_fb_scale_bl(struct msm_fb_data_type *mfd, u32 *bl_lvl)
 
 	(*bl_lvl) = temp;
 }
+//ZTEMT: added by nubia camera for front camera flash  start
+struct msm_fb_data_type *zte_camera_mfd;
+extern int camera_lcd_bkl_handle(void);
+//ZTEMT: added by nubia camera for front camera flash end
 
 /* must call this function from within mfd->bl_lock */
 void mdss_fb_set_backlight(struct msm_fb_data_type *mfd, u32 bkl_lvl)
@@ -1382,6 +1447,7 @@ void mdss_fb_set_backlight(struct msm_fb_data_type *mfd, u32 bkl_lvl)
 	} else {
 		mfd->unset_bl_level = U32_MAX;
 	}
+	zte_camera_mfd = mfd; //ZTEMT: added by nubia camera for front camera flash
 
 	pdata = dev_get_platdata(&mfd->pdev->dev);
 
@@ -1405,6 +1471,7 @@ void mdss_fb_set_backlight(struct msm_fb_data_type *mfd, u32 bkl_lvl)
 			if (mfd->bl_level != bkl_lvl)
 				bl_notify_needed = true;
 			pr_debug("backlight sent to panel :%d\n", temp);
+			if(!camera_lcd_bkl_handle() || (0 == temp)) //ZTEMT: added by nubia camera for front camera flash
 			pdata->set_backlight(pdata, temp);
 			mfd->bl_level = bkl_lvl;
 			mfd->bl_level_scaled = temp;
@@ -1437,6 +1504,7 @@ void mdss_fb_update_backlight(struct msm_fb_data_type *mfd)
 			pdata->set_backlight(pdata, temp);
 			mfd->bl_level_scaled = mfd->unset_bl_level;
 			mfd->allow_bl_update = true;
+			zte_camera_mfd = mfd; //ZTEMT: added by nubia camera for front camera flash
 		}
 	}
 	mutex_unlock(&mfd->bl_lock);

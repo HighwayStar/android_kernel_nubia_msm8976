@@ -1,0 +1,128 @@
+#
+# Synaptics Button DSX touchscreen driver configuration
+#
+menuconfig NUBIA_TOUCHSCREEN_SYNAPTICS_BTN
+	bool "Synaptics Button touchscreen"
+	default n
+	help
+	  Say Y here if you have a Synaptics Button touchscreen connected
+	  to your system.
+
+	  If unsure, say N.
+
+if NUBIA_TOUCHSCREEN_SYNAPTICS_BTN
+
+choice
+	default NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_I2C
+	prompt "Synaptics Button bus interface"
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_I2C
+	bool "RMI over I2C"
+	depends on I2C
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_SPI
+	bool "RMI over SPI"
+	depends on SPI_MASTER
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_RMI_HID_I2C
+	bool "HID over I2C"
+	depends on I2C
+endchoice
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	tristate "Synaptics Button core driver module"
+	depends on I2C || SPI_MASTER
+	help
+	  Say Y here to enable basic touch reporting functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_core.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_RMI_DEV
+	tristate "Synaptics Button RMI device module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for direct RMI register access.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_rmi_dev.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_FW_UPDATE
+	tristate "Synaptics Button firmware update module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for doing firmware update.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_fw_update.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_TEST_REPORTING
+	tristate "Synaptics Button test reporting module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for retrieving production test reports.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_test_reporting.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_PROXIMITY
+	tristate "Synaptics Button proximity module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for proximity functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_proximity.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_ACTIVE_PEN
+	tristate "Synaptics Button active pen module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for active pen functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_active_pen.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_GESTURE
+	tristate "Synaptics Button user defined gesture module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for user defined gesture functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_gesture.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_VIDEO
+	tristate "Synaptics Button video module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for video communication functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_video.
+
+config NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_DEBUG
+	tristate "Synaptics Button debug module"
+	depends on NUBIA_TOUCHSCREEN_SYNAPTICS_BTN_CORE
+	help
+	  Say Y here to enable support for firmware debug functionality.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_btn_dsx_debug.
+
+endif

@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/*
+ * ADD display configuration
+ */
+
+#include "../nubia_panel/nubia_panel.dtsi"
+
+&soc {
+	mdss_dsi: qcom,mdss_dsi@0 {
+		mdss_dsi0: qcom,mdss_dsi_ctrl0@1a94000 {
+			vddio-supply = <&pm8950_l22>;
+		};
+	};
+};
+
+&mdss_dsi0 {
+	vdd-supply = <0>;
+	vddio-supply = <&pm8950_l22>;
+	qcom,dsi-pref-prim-pan =  <&dsi_jdi_nt35695_1080p_5p2_cmd>;
+	qcom,platform-te-gpio = <&msm_gpio 24 0>;
+	qcom,platform-reset-gpio = <&msm_gpio 25 0>;
+	qcom,platform-bklight-en-gpio = <0>;
+	qcom,panel-mode-gpio = <0>;
+};
+
+&mdss_dsi1 {
+	status = "disabled";
+};
+
+&mdss_dsi {
+	hw-config = "single_dsi";
+};
+
+&dsi_jdi_nt35695_1080p_5p2_cmd {
+	qcom,panel-supply-entries = <&jdi_nt35695_1080p_5p2_pwr_supply>;
+	//qcom,disable-dimming-when-suspend;
+	//qcom,disable-dimming-when-resume;
+};
+
+&dsi_ofilm_otm1906c_1080p_5p2_cmd {
+	qcom,panel-supply-entries = <&ofilm_otm1906c_1080p_5p2_pwr_supply>;
+	//qcom,disable-dimming-when-suspend;
+	//qcom,disable-dimming-when-resume;
+};
+
+&dsi_ofilm_otm1906c_1080p_5p2_video {
+	qcom,panel-supply-entries = <&ofilm_otm1906c_1080p_5p2_pwr_supply>;
+	qcom,disable-dimming-when-suspend;
+	qcom,disable-dimming-when-resume;
+};
+
+&pmx_mdss {
+	qcom,num-grp-pins = <1>;
+	qcom,pins = <&gp 25>;
+};
+
+&rpm_bus {
+	rpm-regulator-ldoa22 {
+		status = "okay";
+		pm8950_l22: regulator-l22 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+};
+
+&spmi_bus {
+	qcom,pmi8950@3 {
+		qcom,leds@d800 {
+			qcom,led-strings-list = [00 01];
+			qcom,en-cabc;
+			qcom,fs-curr-ua = <20000>;
+		};
+	};
+};
+
+&soc {
+	jdi_nt35695_1080p_5p2_pwr_supply: jdi_nt35695_1080p_5p2_pwr_supply {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,panel-supply-entry@0 {
+			reg = <0>;
+			qcom,supply-name = "vddio";
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+		};
+
+		qcom,panel-supply-entry@1 {
+			reg = <1>;
+			qcom,supply-name = "lab";
+			qcom,supply-min-voltage = <5500000>;
+			qcom,supply-max-voltage = <5500000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+		};
+
+		qcom,panel-supply-entry@2 {
+			reg = <2>;
+			qcom,supply-name = "ibb";
+			qcom,supply-min-voltage = <5500000>;
+			qcom,supply-max-voltage = <5500000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+			qcom,supply-post-on-sleep = <20>;
+		};
+	};
+
+	ofilm_otm1906c_1080p_5p2_pwr_supply: ofilm_otm1906c_1080p_5p2_pwr_supply {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,panel-supply-entry@0 {
+			reg = <0>;
+			qcom,supply-name = "vddio";
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+		};
+
+		qcom,panel-supply-entry@1 {
+			reg = <1>;
+			qcom,supply-name = "lab";
+			qcom,supply-min-voltage = <5400000>;
+			qcom,supply-max-voltage = <5400000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+		};
+
+		qcom,panel-supply-entry@2 {
+			reg = <2>;
+			qcom,supply-name = "ibb";
+			qcom,supply-min-voltage = <5400000>;
+			qcom,supply-max-voltage = <5400000>;
+			qcom,supply-enable-load = <100000>;
+			qcom,supply-disable-load = <100>;
+			qcom,supply-post-on-sleep = <20>;
+		};
+	};
+};
+

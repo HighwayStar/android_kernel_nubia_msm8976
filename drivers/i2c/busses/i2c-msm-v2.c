@@ -52,6 +52,7 @@ static int  i2c_msm_pm_resume(struct device *dev);
 static void i2c_msm_pm_suspend(struct device *dev);
 static void i2c_msm_clk_path_init(struct i2c_msm_ctrl *ctrl);
 
+
 /* string table for enum i2c_msm_xfer_mode_id */
 const char * const i2c_msm_mode_str_tbl[] = {
 	"FIFO", "BLOCK", "DMA", "None",
@@ -2541,9 +2542,10 @@ static void i2c_msm_rsrcs_irq_teardown(struct i2c_msm_ctrl *ctrl)
 static struct pinctrl_state *
 i2c_msm_rsrcs_gpio_get_state(struct i2c_msm_ctrl *ctrl, const char *name)
 {
+    
 	struct pinctrl_state *pin_state
 			= pinctrl_lookup_state(ctrl->rsrcs.pinctrl, name);
-
+    
 	if (IS_ERR_OR_NULL(pin_state))
 		dev_info(ctrl->dev, "note pinctrl_lookup_state(%s) err:%ld\n",
 						name, PTR_ERR(pin_state));
@@ -2563,13 +2565,11 @@ static int i2c_msm_rsrcs_gpio_pinctrl_init(struct i2c_msm_ctrl *ctrl)
 				PTR_ERR(ctrl->rsrcs.pinctrl));
 		return PTR_ERR(ctrl->rsrcs.pinctrl);
 	}
-
 	ctrl->rsrcs.gpio_state_active =
 		i2c_msm_rsrcs_gpio_get_state(ctrl, I2C_MSM_PINCTRL_ACTIVE);
-
 	ctrl->rsrcs.gpio_state_suspend =
 		i2c_msm_rsrcs_gpio_get_state(ctrl, I2C_MSM_PINCTRL_SUSPEND);
-
+    
 	return 0;
 }
 

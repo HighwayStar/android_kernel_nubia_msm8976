@@ -1,0 +1,7 @@
+config NUBIA_LED_AW2013
+	tristate "aw2013 leds"
+	default n
+	help
+	  Enable aw2013, which will selcted when aw2013 leds connected
+
+

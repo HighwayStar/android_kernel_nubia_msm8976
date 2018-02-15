@@ -1,0 +1,7 @@
+#
+# Near Field Communication (NFC) devices
+#
+
+source "drivers/nubia/nfc/BCM2079X/Kconfig"
+
+

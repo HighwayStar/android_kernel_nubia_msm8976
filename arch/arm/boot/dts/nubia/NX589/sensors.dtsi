@@ -1,0 +1,111 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+
+/*
+ * Add nubia sensors
+ */
+&i2c_6 {
+	ams@39 {
+		compatible = "tmd2725";
+		reg = <0x39>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <140 0>;
+		vdd-supply = <&pm8950_l10>;
+		vio-supply = <&pm8950_l6>;
+		tmd,irq-gpio = <&msm_gpio 140 0x00>;
+		pinctrl-names = "tmd2725_default","tmd2725_sleep";
+		pinctrl-0 = <&tmd2725_default>;
+		pinctrl-1 = <&tmd2725_sleep>;
+		tmd,power_always_on = <1>;
+		tmd,has_als = <1>;
+		tmd,has_ps = <1>;
+		tmd,tp_moudle_count = <3>;
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp0 = "0","0","652","1000","142","874","99";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp1 = "1","1","652","1000","142","874","99";
+		//[module_id] [which_seg] [d_factor] ch0[1] ch1[0] ch0[1] ch1[0]
+		tmd,tp2 = "2","0","652","1000","142","874","99";
+	};
+	aw2013_led@45 {
+		aw2013_led,name = "aw2013";
+		compatible = "aw2013";
+		vdd_ana-supply = <&pm8950_l10>;
+		vcc_i2c-supply = <&pm8950_l5>;
+		/*For adjust the brightness range,values range form 1 to 5.*/
+		middle_grade_percentage = <100>;
+		side_grade_percentage = <100>;
+		grade_scale-offset = <225>;
+		blink_max_grade = <175>;
+		onceblink_fade_time = <1>;
+		onceblink_fullon_time= <0>;
+		onceblink_fulloff_time= <0>;
+		autoblink_fade_time= <4>;
+		autoblink_fullon_time= <0>;
+		autoblink_fulloff_time= <2>;
+		max_current = <0x02>;
+		reg = <0x45>;
+		/*light represents the light position of phone*/
+		/*channel represents the output channel of aw2013 chip*/
+		/*channel number ought to be within 0,1 and 2, not 1,2 and 3*/
+		left_light_which_channel = <0x00>;
+		middle_light_which_channel = <0x02>;
+		right_light_which_channel = <0x01>;
+	};
+};
+
+&tlmm_pinmux {
+	tmd2725_int_pin {
+		qcom,pins = <&gp 140>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "tmd2725-irq";
+		tmd2725_default: tmd2725_default{
+				drive-strength = <6>;
+				bias-pull-up;
+		};
+		tmd2725_sleep: tmd2725_sleep{
+				drive-strength = <2>;
+				bias-pull-up;
+		};
+	};
+};
+
+&pmi8950_haptic{
+		compatible = "qcom,qpnp-haptic";
+		reg = <0xc000 0x100>;
+		interrupts = <0x3 0xc0 0x0>,
+				<0x3 0xc0 0x1>;
+		interrupt-names = "sc-irq", "play-irq";
+		qcom,play-mode = "direct";
+		qcom,wave-play-rate-us = <5263>;
+		qcom,actuator-type = "erm";
+		qcom,wave-shape = "square";
+		qcom,vmax-mv = <3000>;
+		qcom,ilim-ma = <800>;
+		qcom,sc-deb-cycles = <8>;
+		#qcom,int-pwm-freq-khz = <505>;
+		qcom,int-pwm-freq-khz = <1076>;
+		qcom,en-brake;
+		#qcom,brake-pattern = [03 03 00 00];
+		qcom,brake-pattern = [03 03 03 03];
+		qcom,use-play-irq;
+		qcom,use-sc-irq;
+		qcom,wave-samples = [3e 3e 3e 3e 3e 3e 3e 3e];
+		qcom,wave-rep-cnt = <1>;
+		qcom,wave-samp-rep-cnt = <1>;
+		qcom,ztemt_vibrator_ms = <40>;
+};
+
+

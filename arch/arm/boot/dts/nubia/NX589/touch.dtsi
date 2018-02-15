@@ -1,0 +1,348 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+//ldo
+&rpm_bus {
+	rpm-regulator-ldoa11 {
+		status = "okay";
+		pm8950_l11: regulator-l11 {
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			qcom,init-voltage = <3300000>;
+			status = "okay";
+		};
+	};
+
+	rpm-regulator-ldoa22 {
+		status = "okay";
+		pm8950_l22: regulator-l22 {
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			qcom,init-voltage = <1800000>;
+			status = "okay";
+		};
+	};
+};
+
+&pmi8950_gpios {
+	gpio@c000 {
+		qcom,src-sel = <0>;
+		qcom,invert = <1>;
+		status = "okay";
+	};
+	gpio@c100 {
+		qcom,src-sel = <0>;
+		qcom,invert = <1>;
+		status = "okay";
+	};
+};
+
+//pinctrl
+&tlmm_pinmux{
+	nubia_ts_int_active {
+		qcom,pins = <&gp 65>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_int_active";
+
+		synaptics_int_active: synaptics_int_active {
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	nubia_ts_int_suspend {
+		qcom,pins = <&gp 65>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_int_suspend";
+
+		synaptics_int_suspend: synaptics_int_suspend {
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	nubia_ts_reset_active {
+		qcom,pins = <&gp 64>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_reset_active";
+
+		synaptics_reset_active: synaptics_reset_active {
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	nubia_ts_reset_suspend {
+		qcom,pins = <&gp 64>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_reset_suspend";
+
+		synaptics_reset_suspend: synaptics_reset_suspend {
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	nubia_ts_power_active {
+		qcom,pins = <&gp 69>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_power_active";
+
+		synaptics_power_active: synaptics_power_active {
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	nubia_ts_power_suspend {
+		qcom,pins = <&gp 69>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_ts_power_suspend";
+
+		synaptics_power_suspend: synaptics_power_suspend {
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	nubia_btn_int_active {
+		qcom,pins = <&gp 141>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_btn_int_active";
+
+		touch_btn_int_active: touch_btn_int_active {
+			drive-strength = <8>;
+			bias-pull-up;
+		};
+	};
+
+	nubia_btn_int_suspend {
+		qcom,pins = <&gp 141>;
+		qcom,pin-func = <0>;
+		qcom,num-grp-pins = <1>;
+		label = "nubia_btn_int_suspend";
+
+		touch_btn_int_suspend: touch_btn_int_suspend {
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+};
+
+//device
+&i2c_4 {
+	status = "okay";
+	synaptics@20 {
+		status = "disabled"; /* nubia diable default touchpad */
+	};
+	synaptics_dsx@20 {
+		compatible = "synaptics,dsx-i2c";
+		reg = <0x20>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <65 0x2008>;
+		//avdd-supply = <&pm8953_l10>;
+		vdd-supply = <&pm8950_l22>;
+		//synaptics,pwr-reg-name = "avdd";
+		synaptics,bus-reg-name = "vdd";
+		synaptics,avdd-min-voltage = <2850000>;
+		synaptics,avdd-max-voltage = <2850000>;
+		synaptics,avdd-enable-load = <100000>;
+		synaptics,avdd-disable-load = <100>;
+		//synaptics,avdd-pre-off-sleep = <1>;
+		//synaptics,avdd-pre-on-sleep = <1>;
+		synaptics,avdd-post-on-sleep = <1>;
+		synaptics,avdd-post-off-sleep = <1>;
+		synaptics,vdd-min-voltage = <1800000>;
+		synaptics,vdd-max-voltage = <1800000>;
+		synaptics,vdd-enable-load = <100000>;
+		synaptics,vdd-disable-load = <100>;
+		//synaptics,vdd-pre-off-sleep = <1>;
+		//synaptics,vdd-pre-on-sleep = <1>;
+		//synaptics,vdd-post-on-sleep = <10>;
+		//synaptics,vdd-post-off-sleep = <10>;
+		synaptics,irq-gpio = <&msm_gpio 65 0x2008>;
+		synaptics,irq-on-state = <0>;
+		synaptics,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		synaptics,power-gpio-avdd = <&msm_gpio 69 0x0>;
+		synaptics,power-avdd-on-state = <1>;
+		//synaptics,power-gpio-vdd = <&msm_gpio 69 0x0>;
+		//synaptics,power-vdd-on-state = <1>;
+		//synaptics,avdd-always-on;
+		//synaptics,vdd-always-on;
+		synaptics,reset-gpio = <&msm_gpio 64 0x0>;
+		synaptics,reset-on-state = <0>;
+		synaptics,reset-active-ms = <20>;
+		synaptics,reset-delay-ms = <20>;
+		synaptics,reset-on-sleep = <1>;
+		synaptics,reset-off-sleep = <1>;
+		synaptics,cap-button-codes = <172 139 158>;
+		synaptics,ub-i2c-addr = <0x2c>;
+		//synaptics,open-charge-bit;
+		synaptics,power-on-gpio-first;
+		//synaptics,power-off-gpio-first;
+		synaptics,power-on-avdd-first;
+		//synaptics,touch-resume-first;
+		//synaptics,touch-suspend-first;
+		//synaptics,fb-ready-reset;
+		synaptics,palm-register-addr = <0x0400>;
+		synaptics,product-panel1-id1 = "NX569-JDIA";
+		synaptics,product-panel1-id2 = "NX589-JDIA";
+		synaptics,product-panel2-id1 = "NX589-CTC";
+		synaptics,product-panel2-id2 = "NX569-CTC";
+		synaptics,product-panel3-id1 = "s3320";
+		synaptics,product-panel3-id2 = "s3320";
+		synaptics,firmware-image-name1 = "nubia_tp_jdi_fw.img";
+		synaptics,firmware-image-name2 = "nubia_tp_ofilm_fw.img";
+		synaptics,firmware-image-name3 = "nubia_tp_jdi_fw.img";
+		synaptics,factory-check-2d-max-cap = <3800>;
+		synaptics,factory-check-2d-min-cap = <1500>;
+		pinctrl-names = "synaptics_pin_active", "synaptics_pin_suspend";
+		pinctrl-0 = <&synaptics_int_active &synaptics_reset_active &synaptics_power_active>;
+		pinctrl-1 = <&synaptics_int_suspend &synaptics_reset_suspend &synaptics_power_suspend>;
+		/* uncomment and update lines below as appropriate if there are virtual buttons */
+		/* synaptics,vir-button-codes = <102 100 900 100 60 158 300 900 100 60>; */
+		/* synaptics,max-y-for-2d = <800>; */
+	};
+};
+
+&i2c_8 {
+	status = "okay";
+	cypress_button@28 {
+		status = "disabled";
+		compatible = "cypress,s1302s";
+		reg = <0x28>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <141 0x2008>;
+		cypress,irq-gpio = <&msm_gpio 141 0x2008>;
+		cypress,irq-on-state = <0>;
+		cypress,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		//cypress,power-delay-ms = <20>;
+		cypress,power-avdd-gpio = <&msm_gpio 1 0x0>;
+		cypress,power-vddio-gpio = <&msm_gpio 2 0x0>;
+		cypress,power-on-state = <1>;
+		cypress,cap-button-codes = <172 139 158>;
+		//pinctrl-names = "cypress_pin_active", "cypress_pin_suspend";
+		//pinctrl-0 = <&cypress_int_active &cypress_reset_active &cypress_power_active>;
+		//pinctrl-1 = <&cypress_int_suspend &cypress_reset_suspend &cypress_power_suspend>;
+	};
+
+	synaptics_s1302@20 {
+		status = "disabled";
+		compatible = "synaptics,s1302";
+		reg = <0x20>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <141 0x2008 >;
+		synaptics,irq-gpio = <&msm_gpio 141 0x2008>;
+		synaptics,irq-on-state = <0>;
+		synaptics,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		vdd_ana-supply = <&pm8950_l11>;
+		vcc_i2c-supply = <&pm8950_l22>;
+		synaptics,pwr-reg-name = "vdd_ana";
+		synaptics,bus-reg-name = "vcc_i2c";
+		synaptics,power-gpio-vdd = <&pmi8950_gpios 1 0x0>;
+		synaptics,power-gpio-vcc = <&pmi8950_gpios 2 0x0>;
+		synaptics,power-on-state = <1>;
+		synaptics,power-delay-ms = <20>;
+		synaptics,ub-i2c-addr = <0x20>;
+		synaptics,virkeynum = <2>;
+		synaptics,key0name  = "MENU";
+		synaptics,key0TX = <1>;
+		synaptics,key0RX = <1>;
+		synaptics,key0minval = <2400>;
+		synaptics,key0maxval = <3500>;
+		synaptics,key1name = "BACK";
+		synaptics,key1TX = <2>;
+		synaptics,key1RX = <1>;
+		synaptics,key1minval = <2700>;
+		synaptics,key1maxval = <4000>;
+		synaptics,cap-button-codes = <158 139>;
+		pinctrl-names = "touch_button_pin_active", "touch_button_pin_suspend";
+		pinctrl-0 = <&touch_btn_int_active>;
+		pinctrl-1 = <&touch_btn_int_suspend>;
+	};
+
+	synaptics_dsx@20 {
+		compatible = "synaptics,btn-i2c";
+		reg = <0x20>;
+		interrupt-parent = <&msm_gpio>;
+		interrupts = <141 0x2008>;
+		avdd-supply = <&pm8950_l11>;
+		//vdd-supply = <&pm8950_l22>;
+		synaptics,pwr-reg-name = "avdd";
+		//synaptics,bus-reg-name = "vdd";
+		synaptics,avdd-min-voltage = <3300000>;
+		synaptics,avdd-max-voltage = <3300000>;
+		synaptics,avdd-enable-load = <100000>;
+		synaptics,avdd-disable-load = <100>;
+		//synaptics,avdd-pre-off-sleep = <1>;
+		//synaptics,avdd-pre-on-sleep = <1>;
+		synaptics,avdd-post-on-sleep = <1>;
+		synaptics,avdd-post-off-sleep = <1>;
+		synaptics,vdd-min-voltage = <1800000>;
+		synaptics,vdd-max-voltage = <1800000>;
+		synaptics,vdd-enable-load = <100000>;
+		synaptics,vdd-disable-load = <100>;
+		//synaptics,vdd-pre-off-sleep = <1>;
+		//synaptics,vdd-pre-on-sleep = <1>;
+		synaptics,vdd-post-on-sleep = <10>;
+		synaptics,vdd-post-off-sleep = <10>;
+		synaptics,irq-gpio = <&msm_gpio 141 0x2008>;
+		synaptics,irq-on-state = <0>;
+		synaptics,irq-flags = <0x2008>; /* IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		synaptics,power-gpio-avdd = <&pmi8950_gpios 1 0x0>;
+		synaptics,power-avdd-on-state = <1>;
+		synaptics,power-gpio-vdd = <&pmi8950_gpios 2 0x0>;
+		synaptics,power-vdd-on-state = <1>;
+		synaptics,avdd-always-on;
+		synaptics,vdd-always-on;
+		//synaptics,reset-gpio = <&msm_gpio 64 0x0>;
+		//synaptics,reset-on-state = <0>;
+		synaptics,reset-active-ms = <20>;
+		synaptics,reset-delay-ms = <200>;
+		synaptics,cap-button-codes = <158 139 >;
+		synaptics,ub-i2c-addr = <0x2c>;
+		//synaptics,open-charge-bit;
+		//synaptics,power-on-gpio-first;
+		//synaptics,power-off-gpio-first;
+		synaptics,power-on-avdd-first;
+		//synaptics,touch-resume-first;
+		//synaptics,touch-suspend-first;
+		synaptics,fb-ready-reset;
+		synaptics,palm-register-addr = <0x0400>;
+		synaptics,product-panel1-id1 = "s1302";
+		synaptics,product-panel1-id2 = "s1302";
+		synaptics,product-panel2-id1 = "NUBIA";
+		synaptics,product-panel2-id2 = "NUBIA";
+		synaptics,product-panel3-id1 = "NUBIA";
+		synaptics,product-panel3-id2 = "NUBIA";
+		synaptics,firmware-image-name1 = "nubia_tp_btn_jdi_fw.img";
+		synaptics,firmware-image-name2 = "nubia_tp_btn_ofilm_fw.img";
+		synaptics,firmware-image-name3 = "nubia_tp.img";
+		synaptics,factory-check-2d-max-cap = <3800>;
+		synaptics,factory-check-2d-min-cap = <1500>;
+		pinctrl-names = "touch_button_pin_active", "touch_button_pin_suspend";
+		pinctrl-0 = <&touch_btn_int_active>;
+		pinctrl-1 = <&touch_btn_int_suspend>;
+		/* uncomment and update lines below as appropriate if there are virtual buttons */
+		/* synaptics,vir-button-codes = <102 100 900 100 60 158 300 900 100 60>; */
+		/* synaptics,max-y-for-2d = <800>; */
+	};
+};
+

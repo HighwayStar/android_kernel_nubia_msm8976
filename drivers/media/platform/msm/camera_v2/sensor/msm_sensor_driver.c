@@ -870,7 +870,7 @@ int32_t msm_sensor_driver_probe(void *setting,
 	if (rc < 0) {
 		pr_err("failed: msm_camera_get_dt_power_setting_data rc %d",
 			rc);
-		goto free_camera_info;
+		//goto free_camera_info;//ZTEMT: guxiaodong modify for NX589J
 	}
 
 	/* Parse and fill vreg params for powerdown settings*/
@@ -882,7 +882,7 @@ int32_t msm_sensor_driver_probe(void *setting,
 	if (rc < 0) {
 		pr_err("failed: msm_camera_fill_vreg_params for PDOWN rc %d",
 			rc);
-		goto free_camera_info;
+		//goto free_camera_info;//ZTEMT: guxiaodong modify for NX589J
 	}
 
 CSID_TG:

@@ -1,0 +1,97 @@
+/*
+ * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	/* used for fingerprint device as platform device added by nubia */
+	fpc1020 {
+		 status = "ok";
+		 compatible = "fpc,fpc1020";
+		 input-device-name = "fpc1020";
+		 interrupt-parent = <&msm_gpio>;
+		 interrupts = <33 0>;
+		 fpc,reset-gpio  = <&msm_gpio 51 0x00>;
+		 fpc,irq-gpio = <&msm_gpio 33 0x00>;
+		 fpc,enable-vdd-ldo= <&msm_gpio 112 0x00>;
+
+		 pinctrl-names = "pmx_fp_active", "pmx_fp_suspend";
+		 pinctrl-0 = <&fp_drdy_active &fp_rst_active &fp_enable_active >;
+		 pinctrl-1 = <&fp_drdy_suspend &fp_rst_suspend &fp_enable_suspend >;
+
+		 /*clock-names = "iface_clk", "core_clk";
+		 clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
+				 <&clock_gcc clk_gcc_blsp2_qup3_spi_apps_clk>;*/
+	};
+};
+
+/*****finger pinctrl start *****/
+&soc{
+tlmm_pinmux: pinctrl@1000000{
+	fp_enable_gpio: fp_enable_gpio {
+		  label = "fp_enable_gpio";
+		  qcom,pins = <&gp 112>;
+		  qcom,num-grp-pins = <1>;
+		  qcom,pin-func = <0>;
+		  fp_enable_active: fp_enable_active {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+		  fp_enable_suspend: fp_enable_suspend {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+	};
+
+	fp_drdy_gpio: fp_drdy_gpio {
+		  label = "fp_drdy_gpio";
+		  qcom,pins = <&gp 33>;
+		  qcom,pin-func = <0>;
+		  qcom,num-grp-pins = <1>;
+		  fp_drdy_active: fp_drdy_active {
+				  drive-strength = <16>;
+				  bias-disable;
+		  };
+		  fp_drdy_suspend: fp_drdy_suspend {
+				  drive-strength = <2>;
+				  bias-disable;
+		  };
+	};
+
+	fp_rst_gpio {
+		  label = "fp_rst_gpio";
+		  qcom,pins = <&gp 51>;
+		  qcom,num-grp-pins = <1>;
+		  qcom,pin-func = <0>;
+		  fp_rst_active: fp_rst_active {
+				  drive-strength = <10>;
+				  bias-pull-up;
+		  };
+		  fp_rst_suspend: fp_rst_suspend  {
+				  drive-strength = <2>;
+				  bias-pull-up;
+		  };
+	};
+	/* used for spi6 and fingerprint added by nubia */
+};
+};
+
+/*****finger memory changed *****/
+/*&memory{*/
+&other_ext_mem{
+	reg = <0x0 0x84a00000 0x0 0x1e00000>;
+};
+&cont_splash_mem{
+	reg = <0x0 0x8de00000 0x0 0x2800000>;
+};
+&qcom_seecom{
+	reg = <0x84a00000 0x1900000>;
+};

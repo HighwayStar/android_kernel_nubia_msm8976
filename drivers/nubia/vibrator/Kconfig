@@ -1,0 +1,11 @@
+#
+# DRV2605 vibrator configuration
+#
+
+config NUBIA_VIBRATOR_DRV2605
+	tristate "VIBRATOR TI_DRV2605"
+	default n
+	help
+	  Say Y here if you want to enable vibrator of TI_DRV2605.
+
+

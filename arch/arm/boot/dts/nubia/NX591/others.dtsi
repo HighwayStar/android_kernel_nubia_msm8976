@@ -1,0 +1,65 @@
+/*
+ * nubia overwrite dts
+ */
+
+&spmi_bus {
+        qcom,pm8950@0 {
+               qcom,power-on@800 {
+                       qcom,pon_1 {
+                                qcom,support-reset = <1>;
+                                qcom,s1-timer = <10256>;
+                                qcom,s2-timer = <2000>;
+                                qcom,s2-type = <7>;
+                        };
+                };
+        };
+
+	pm8998_rtc: qcom,pm8998_rtc {
+               qcom,qpnp-rtc-alarm-pwrup = <1>;
+	};
+};
+
+/*added by qinyongli for tas2555   ---begin */
+&i2c_8 {
+	tas2555@4C {
+		compatible = "ti,tas2555";
+		reg = <0x4C>;
+		ti,reset-gpio = <&msm_gpio 62 0x00>;
+	};
+};
+/*added by qinyongli for tas2555   ---end */
+
+&soc {
+	qcom,bcl {
+		qcom,ibat-monitor {
+			qcom,soc-low-threshold = <5>;
+		};
+	};
+	qcom,wdt@b017000 {
+		qcom,bark-time = <20000>;
+		qcom,pet-time = <15000>;
+	};
+};
+
+/ {
+        memory {
+               pstore_reserve_mem: pstore_reserve_mem_region@0 {
+                        linux,reserve-contiguous-region;
+                        linux,reserve-region;
+                        linux,remove-completely;
+                        reg = <0x0 0x9ff00000 0x0 0x00100000>;
+                        label = "pstore_reserve_mem";
+                };
+	};
+};
+
+/* keyreset feature */
+&soc {
+	keyreset {
+		compatible = "nubia,keyreset";
+		keys-down = <0x73 0x72>;
+		keys-up = <0x73 0x72>;
+		keyreset-need-panic;
+		key_down_delay = <20>;
+	};
+};
