@@ -97,8 +97,12 @@ enum {
 #define EAR_PMU 1
 #define SPK_PMD 2
 #define SPK_PMU 3
-
+#ifdef CONFIG_NUBIA_AUDIO_FEATURE
+#define MICBIAS_DEFAULT_VAL 2500000
+#else
 #define MICBIAS_DEFAULT_VAL 1800000
+#endif
+
 #define MICBIAS_MIN_VAL 1600000
 #define MICBIAS_STEP_SIZE 50000
 
@@ -3449,7 +3453,8 @@ static int msm8x16_wcd_codec_enable_micbias(struct snd_soc_dapm_widget *w,
 			__func__, w->reg);
 		return -EINVAL;
 	}
-
+        //add by lihongda to change micbias reference
+        //add end
 	micbias2 = (snd_soc_read(codec, MSM8X16_WCD_A_ANALOG_MICB_2_EN) & 0x80);
 	switch (event) {
 	case SND_SOC_DAPM_PRE_PMU:
@@ -3458,7 +3463,7 @@ static int msm8x16_wcd_codec_enable_micbias(struct snd_soc_dapm_widget *w,
 				snd_soc_update_bits(codec,
 					MSM8X16_WCD_A_ANALOG_TX_1_2_ATEST_CTL_2,
 					0x02, 0x02);
-			snd_soc_update_bits(codec, micb_int_reg, 0x80, 0x80);
+			snd_soc_update_bits(codec, micb_int_reg, 0x80, 0x80);//for change micbias reference
 		} else if (strnstr(w->name, internal2_text, strlen(w->name))) {
 			snd_soc_update_bits(codec, micb_int_reg, 0x10, 0x10);
 			snd_soc_update_bits(codec, w->reg, 0x60, 0x00);
@@ -3470,12 +3475,14 @@ static int msm8x16_wcd_codec_enable_micbias(struct snd_soc_dapm_widget *w,
 				MSM8X16_WCD_A_ANALOG_MICB_1_EN, 0x05, 0x04);
 		if (w->reg == MSM8X16_WCD_A_ANALOG_MICB_1_EN)
 			msm8x16_wcd_configure_cap(codec, true, micbias2);
+                //if (strnstr(w->name, external_text, strlen(w->name)))
+                  //      snd_soc_update_bits(codec, micb_int_reg, 0xff, 0x08);
 
 		break;
 	case SND_SOC_DAPM_POST_PMU:
 		usleep_range(20000, 20100);
 		if (strnstr(w->name, internal1_text, strlen(w->name))) {
-			snd_soc_update_bits(codec, micb_int_reg, 0x40, 0x40);
+			snd_soc_update_bits(codec, micb_int_reg, 0x40, 0x40);//for change micbias reference
 		} else if (strnstr(w->name, internal2_text,  strlen(w->name))) {
 			snd_soc_update_bits(codec, micb_int_reg, 0x08, 0x08);
 			msm8x16_notifier_call(codec,

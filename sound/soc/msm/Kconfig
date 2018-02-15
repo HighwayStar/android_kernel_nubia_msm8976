@@ -352,4 +352,29 @@ config SND_SOC_MDM9640
 	 interfaces with DSP, also it will enable
 	 the machine drivers and the corresponding
 	 DAI-links.
+config NUBIA_AUDIO_EXTERNAL_PA_AW87xx
+     tristate "use to enable the external audio PA AW87xx"
+     default n
+     help
+     use to enable the external audio PA AW87xx
+
+config NUBIA_AUDIO_MULTIPLE_AW_PA
+     tristate "use to enable the type detect for AW87xx"
+     default n
+     help
+     use to enable the type detect for AW87xx
+
+
+config NUBIA_AUDIO_FEATURE
+   bool "AUDIO MACRO for the same info for NUBIA project"
+   default n
+   help
+      AUDIO MACRO for NUBIA  project
+
+config NUBIA_AUDIO_MULTIPLE_BOX
+     tristate "use to distinguish speaker box manufacturer"
+     default n
+     help
+     use to distinguish speaker box manufacturer
+
 endmenu
