@@ -241,3 +241,10 @@ config MSM_JPEGDMA
         select V4L2_MEM2MEM_DEV
 	---help---
 	  Enable support for Jpeg dma engine.
+#ZTEMT: congshan add for AL3200--------Start
+config AL3200
+	bool "al3200 camera debugging with printk"
+	depends on MSMB_CAMERA
+	---help---
+	  Enable support mini isp.
+#ZTEMT: congshan add for AL3200--------End
