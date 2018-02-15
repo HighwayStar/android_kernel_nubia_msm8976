@@ -47,6 +47,10 @@ ifeq ($(strip $(KERNEL_GCC_NOANDROID_CHK)),0)
 KERNEL_CFLAGS := KCFLAGS=-mno-android
 endif
 
+#add for nubia dts
+ZTEMT_DTS_NAME:=$(DTS_NAME)
+export ZTEMT_DTS_NAME
+
 KERNEL_OUT := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ
 KERNEL_CONFIG := $(KERNEL_OUT)/.config
 
