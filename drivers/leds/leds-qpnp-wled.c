@@ -44,7 +44,9 @@
 #define QPNP_WLED_SOFTSTART_RAMP_DLY(b) (b + 0x53)
 #define QPNP_WLED_VLOOP_COMP_RES_REG(b)	(b + 0x55)
 #define QPNP_WLED_VLOOP_COMP_GM_REG(b)	(b + 0x56)
+#define QPNP_WLED_EN_PSM_REG(b)	(b + 0x5A)
 #define QPNP_WLED_PSM_CTRL_REG(b)	(b + 0x5B)
+#define QPNP_WLED_PFM_CTRL_REG(b)	(b + 0x5D)
 #define QPNP_WLED_SC_PRO_REG(b)		(b + 0x5E)
 #define QPNP_WLED_TEST1_REG(b)		(b + 0xE2)
 #define QPNP_WLED_TEST4_REG(b)		(b + 0xE5)
@@ -189,6 +191,7 @@
 
 #define QPNP_WLED_MAX_STRINGS		4
 #define WLED_MAX_LEVEL_4095		4095
+#define WLED_6p25_LEVEL_256		256
 #define QPNP_WLED_RAMP_DLY_MS		20
 #define QPNP_WLED_TRIGGER_NONE		"none"
 #define QPNP_WLED_STR_SIZE		20
@@ -306,6 +309,7 @@ struct qpnp_wled {
 	bool disp_type_amoled;
 	bool en_ext_pfet_sc_pro;
 	bool prev_state;
+	int pfm_enabled;
 };
 
 /* helper to read a pmic register */
@@ -381,6 +385,12 @@ static int qpnp_wled_set_level(struct qpnp_wled *wled, int level)
 {
 	int i, rc;
 	u8 reg;
+
+	reg = 0x00;
+	rc = qpnp_wled_write_reg(wled, &reg,
+		QPNP_WLED_EN_PSM_REG(wled->ctrl_base));
+	if (rc < 0)
+		return rc;
 
 	/* set brightness registers */
 	for (i = 0; i < wled->num_strings; i++) {
