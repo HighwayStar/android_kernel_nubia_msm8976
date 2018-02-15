@@ -66,6 +66,22 @@ config USB
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called usbcore.
+config ZTEMT_USB
+       boolean "Support for ZTEMT USB Driver"
+       depends on USB
+       default y
+       help
+         Say Y here if you need to modify USB related code for ZTEMT projects,
+         and remember to use CONFIG_ZTEMT_USB to mark your code.
+
+config ZTEMT_USB_DEBUG
+       boolean "Support for ZTEMT USB DEBUG info"
+       depends on USB
+       default n
+       help
+         Use ZTEMT USB driver debug info.
+
+
 
 if USB
 
