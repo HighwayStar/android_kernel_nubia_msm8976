@@ -437,7 +437,7 @@ static void dpm_wd_set(struct dpm_watchdog *wd, struct device *dev)
 	wd->tsk = get_current();
 
 	init_timer_on_stack(timer);
-	timer->expires = jiffies + HZ * 12;
+	timer->expires = jiffies + HZ * 24;
 	timer->function = dpm_wd_handler;
 	timer->data = (unsigned long)wd;
 	add_timer(timer);
