@@ -976,7 +976,45 @@ static int pmic_arb_pic_disable(struct spmi_controller *ctrl,
 	spin_unlock_irqrestore(&pmic_arb->lock, flags);
 	return 0;
 }
+#ifdef CONFIG_ZTEMT_COMMON_CHARGER
+static void register_status_debug(struct spmi_pmic_arb_dev *pmic_arb)
+{
+	uint32_t apid;
+	int j;
 
+	//debug purpose only
+	for (apid = 0; apid < pmic_arb->max_periph_intrs; ++apid)
+		dev_err(pmic_arb->dev, "IRQ Clear[0x%llx]: 0x%x, ACC enabled[0x%llx]: 0x%x\n",
+				(unsigned long long)pmic_arb->ver->irq_clear(apid), readl_relaxed(pmic_arb->intr + pmic_arb->ver->irq_clear(apid)),
+				(unsigned long long)pmic_arb->ver->acc_enable(apid), readl_relaxed(pmic_arb->intr + pmic_arb->ver->acc_enable(apid)));
+
+		for (j=0; j<=7; j++) {
+				dev_err(pmic_arb->dev, "Acc Status[0x%llx]: 0x%x\n", 
+				    (unsigned long long)pmic_arb->ver->owner_acc_status(0, j), readl_relaxed(pmic_arb->intr + pmic_arb->ver->owner_acc_status(0, j)));
+		}
+}
+
+static void pmic_arb_clear_spmi(struct spmi_pmic_arb_dev *pmic_arb)
+{
+	uint32_t apid;
+
+	dev_err(pmic_arb->dev, " %s: %d\n", __func__, __LINE__);
+		 		 register_status_debug(pmic_arb);
+
+	for (apid = 0; apid < pmic_arb->max_periph_intrs; ++apid) {
+		u32 owner = SPMI_OWNERSHIP_PERIPH2OWNER(
+				readl_relaxed(pmic_arb->cnfg +
+				    SPMI_OWNERSHIP_TABLE_REG(apid)));
+
+		if (owner == pmic_arb->ee) {
+				writel_relaxed(0x0, pmic_arb->intr +
+				    pmic_arb->ver->irq_clear(apid));
+				writel_relaxed(0x0, pmic_arb->intr +
+				    pmic_arb->ver->acc_enable(apid));
+		}
+	}
+}
+#endif
 static irqreturn_t
 periph_interrupt(struct spmi_pmic_arb_dev *pmic_arb, u8 apid, bool show)
 {
@@ -991,6 +1029,9 @@ periph_interrupt(struct spmi_pmic_arb_dev *pmic_arb, u8 apid, bool show)
 		dev_err(pmic_arb->dev,
 		"periph_interrupt(apid:0x%x sid:0x%x pid:0x%x) unknown peripheral\n",
 			apid, sid, pid);
+	#ifdef CONFIG_ZTEMT_COMMON_CHARGER
+	  pmic_arb_clear_spmi(pmic_arb);
+	#endif
 		/* return IRQ_NONE; */
 	}
 

@@ -70,3 +70,11 @@ obj-y				+= qcom/
 obj-$(CONFIG_USB_EXT_TYPE_C_PERICOM)	+= type-c-pericom.o
 obj-$(CONFIG_USB_EXT_TYPE_C_TI)		+= type-c-ti.o
 obj-$(CONFIG_UID_SYS_STATS) += uid_sys_stats.o
+obj-$(CONFIG_UID_CPUTIME) 	+= uid_cputime.o
+#################################################NUBIA TYPEC IC START
+obj-$(CONFIG_FUSB301_USBTYPE_C)	+= fusb301.o
+obj-$(CONFIG_PTN5150_USBTYPE_C)	+= ptn5150.o
+obj-$(CONFIG_TUSB320_USBTYPE_C)	+= tusb320.o
+obj-$(CONFIG_PI5U_USBTYPE_C)	+= pi5u.o
+#################################################NUBIA TYPEC IC END
+

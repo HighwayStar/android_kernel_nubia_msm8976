@@ -198,6 +198,31 @@ config ICS932S401
 	  This driver can also be built as a module. If so, the module
 	  will be called ics932s401.
 
+
+config FUSB301_USBTYPE_C
+	tristate "Integrated Circuits FAIRCHILD USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config PTN5150_USBTYPE_C
+	tristate "Integrated Circuits NXP USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config TUSB320_USBTYPE_C
+	tristate "Integrated Circuits TI USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
+config PI5U_USBTYPE_C
+	tristate "Integrated Circuits PERICOM USB TYPE C"
+	depends on I2C
+	help
+	   support usb type c.
+
 config ATMEL_SSC
 	tristate "Device driver for Atmel SSC peripheral"
 	depends on HAS_IOMEM
