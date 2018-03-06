@@ -289,10 +289,6 @@ config QPNP_HAPTIC
 	  on the Qualcomm Technologies' QPNP PMICs. It uses the android
 	  timed-output framework.
 
-config FEATURE_ZTEMT_HAPTIC_VIBRATOR
-	tristate "FEATURE_ZTEMT_HAPTIC_VIBRATOR"
-	depends on QPNP_HAPTIC
-	default n
 config SEEMP_CORE
 	tristate "SEEMP Core"
 	help

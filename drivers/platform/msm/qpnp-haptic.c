@@ -151,16 +151,6 @@
 #define POLL_TIME_AUTO_RES_ERR_NS	(5 * NSEC_PER_MSEC)
 
 #define LRA_POS_FREQ_COUNT		6
-//#define DEBUG
-#ifdef DEBUG
-	#define hap_debug(format , ...)   printk(format, ##__VA_ARGS__)
-#else
-	#define hap_debug(format , ...)
-#endif
-#define LOG_TAG		"VIBRATOR_HAPTIC"
-#define LOG_DEBUG(fmt, args...) 	printk(KERN_DEBUG"[%s] [%s:%d]"fmt,	\
-								LOG_TAG, __FUNCTION__, __LINE__, ##args);
-
 int lra_play_rate_code[LRA_POS_FREQ_COUNT];
 
 /* haptic debug register set */
@@ -343,9 +333,6 @@ struct qpnp_hap {
 	bool sup_brake_pat;
 	bool correct_lra_drive_freq;
 	bool misc_trim_error_rc19p2_clk_reg_present;
-#ifdef CONFIG_FEATURE_ZTEMT_HAPTIC_VIBRATOR
-	u32 ztemt_vibrator_ms;
-#endif
 };
 
 static struct qpnp_hap *ghap;
@@ -1587,9 +1574,6 @@ static void qpnp_hap_td_enable(struct timed_output_dev *dev, int value)
 		}
 		hap->state = 0;
 	} else {
-#ifdef CONFIG_FEATURE_ZTEMT_HAPTIC_VIBRATOR
-	value = value +hap->ztemt_vibrator_ms;
-#endif
 		value = (value > hap->timeout_ms ?
 				 hap->timeout_ms : value);
 		hap->state = 1;
@@ -1598,9 +1582,7 @@ static void qpnp_hap_td_enable(struct timed_output_dev *dev, int value)
 			      HRTIMER_MODE_REL);
 	}
 	mutex_unlock(&hap->lock);
-	LOG_DEBUG("start enable\n");
-	queue_work(system_unbound_wq, &hap->work);
-	//schedule_work(&hap->work);
+	schedule_work(&hap->work);
 }
 
 /* play pwm bytes */
@@ -1682,10 +1664,6 @@ static void qpnp_hap_worker(struct work_struct *work)
 		rc = qpnp_hap_write_reg(hap, &val,
 				QPNP_HAP_EN_CTL_REG(hap->base));
 	} else {
-		if(hap->state)
-			LOG_DEBUG("end enable\n");
-		if(!hap->state)
-			LOG_DEBUG("end disable\n");
 		if (hap->play_mode == QPNP_HAP_PWM)
 			qpnp_hap_mod_enable(hap, hap->state);
 		qpnp_hap_set(hap, hap->state);
@@ -1720,9 +1698,7 @@ static enum hrtimer_restart qpnp_hap_timer(struct hrtimer *timer)
 							 hap_timer);
 
 	hap->state = 0;
-	LOG_DEBUG("start disable\n");
-	queue_work(system_unbound_wq, &hap->work);
-	//schedule_work(&hap->work);
+	schedule_work(&hap->work);
 
 	return HRTIMER_NORESTART;
 }
@@ -2031,17 +2007,6 @@ static int qpnp_hap_parse_dt(struct qpnp_hap *hap)
 		return rc;
 	}
 
-#ifdef CONFIG_FEATURE_ZTEMT_HAPTIC_VIBRATOR
-	hap->ztemt_vibrator_ms=0;
-	rc = of_property_read_u32(spmi->dev.of_node,
-			"qcom,ztemt_vibrator_ms", &temp);
-	if (!rc) {
-		hap->ztemt_vibrator_ms = temp;
-	} else if (rc != -EINVAL) {
-		dev_err(&spmi->dev, "Unable to read ztemt_vibrator_ms\n");
-		return rc;
-	}
-#endif
 	hap->act_type = QPNP_HAP_LRA;
 	rc = of_property_read_string(spmi->dev.of_node,
 			"qcom,actuator-type", &temp_str);
