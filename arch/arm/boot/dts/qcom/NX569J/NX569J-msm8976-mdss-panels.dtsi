@@ -10,35 +10,16 @@
  * GNU General Public License for more details.
  */
 
-#include "../dsi-panel-sim-video.dtsi"
-#include "../dsi-panel-sim-cmd.dtsi"
-#include "../dsi-panel-nt35597-dualmipi-wqxga-video.dtsi"
-#include "../dsi-panel-nt35597-dualmipi-wqxga-cmd.dtsi"
-#include "../dsi-panel-otm1906c-1080p-cmd.dtsi"
-#include "../dsi-panel-hx8399a-1080p-video.dtsi"
-#include "../dsi-panel-nt35597-dsc-wqxga-video.dtsi"
-#include "../dsi-panel-nt35597-dsc-wqxga-cmd.dtsi"
-#include "../dsi-panel-truly-1080p-video.dtsi"
-#include "../dsi-panel-truly-1080p-cmd.dtsi"
-#include "../dsi-panel-adv7533-1080p-video.dtsi"
-#include "../dsi-panel-adv7533-720p-video.dtsi"
-#include "../dsi-panel-nt35523-dualmipi-wqxga-video.dtsi"
 
 #include "../nubia_panel/nubia_panel.dtsi"
 
 &soc {
 	dsi_panel_pwr_supply: dsi_panel_pwr_supply {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
 
 		qcom,panel-supply-entry@0 {
-			reg = <0>;
 			qcom,supply-name = "vddio";
 			qcom,supply-min-voltage = <1800000>;
 			qcom,supply-max-voltage = <1800000>;
-			qcom,supply-enable-load = <100000>;
-			qcom,supply-disable-load = <100>;
 		};
 
 		qcom,panel-supply-entry@1 {
@@ -59,6 +40,7 @@
 			qcom,supply-disable-load = <100>;
 			qcom,supply-post-on-sleep = <20>;
 		};
+		/delete-node/ qcom,panel-supply-entry@3;
 	};
 
 	ofilm_otm1906c_1080p_5p2_pwr_supply: ofilm_otm1906c_1080p_5p2_pwr_supply {
@@ -73,6 +55,7 @@
 			qcom,supply-max-voltage = <1800000>;
 			qcom,supply-enable-load = <100000>;
 			qcom,supply-disable-load = <100>;
+
 		};
 
 		qcom,panel-supply-entry@1 {
@@ -82,6 +65,7 @@
 			qcom,supply-max-voltage = <5400000>;
 			qcom,supply-enable-load = <100000>;
 			qcom,supply-disable-load = <100>;
+
 		};
 
 		qcom,panel-supply-entry@2 {

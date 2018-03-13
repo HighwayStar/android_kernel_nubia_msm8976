@@ -1,0 +1,472 @@
+/*
+ * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	tlmm_pinmux: pinctrl@1000000 {
+		/delete-node/ blsp1_uart1_active;
+		/delete-node/ blsp1_uart1_sleep;
+
+		ti_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_int_pin";
+
+			ti_int_active: ti_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			};
+			ti_int_suspend: ti_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+
+		ti_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "ti_enable_pin";
+			ti_enable_active: ti_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			ti_enable_suspend: ti_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+
+		fchild_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "fchild_int_pin";
+
+			fchild_int_active: fchild_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			};
+			fchild_int_suspend: fchild_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+		/*
+		fchild_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "fchild_enable_pin";
+			fchild_enable_active: fchild_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			fchild_enable_suspend: fchild_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+                };*/
+
+
+		nxp_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "nxp_int_pin";
+
+			nxp_int_active: nxp_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			};
+			nxp_int_suspend: nxp_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+
+		nxp_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "nxp_enable_pin";
+			nxp_enable_active: nxp_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			nxp_enable_suspend: nxp_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+
+		pericom_int_pin{
+			qcom,pins = <&gp 106>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_int_pin";
+
+			pericom_int_active: pericom_int_active {
+					drive-strength = <10>;
+					bias-pull-up;
+			};
+			pericom_int_suspend: pericom_int_suspend {
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+
+		pericom_enable_pin{
+			qcom,pins = <&gp 52>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			label = "pericom_enable_pin";
+			pericom_enable_active: pericom_enable_active {
+				drive-strength = <6>;
+				bias-pull-up;
+				output-high;
+			};
+			pericom_enable_suspend: pericom_enable_suspend {
+				drive-strength = <6>;
+				bias-pull-down;
+				output-low;
+			};
+		};
+
+
+		cti_trigout_b0 {
+			qcom,pins = <&gp 22>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <11>;
+			label = "cti-trigout-b0";
+			trigout_b0: trigout_b0 {
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		sdc3_wlan_gpio {
+			/delete-property/ qcom,pins;
+		};
+
+		/*****finger start *****/
+		gf_enable_gpio: gf_enable_gpio {
+			label = "gf_enable_gpio";
+			qcom,pins = <&gp 112>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			gf_enable_active: gf_enable_active {
+				drive-strength = <10>;
+				bias-pull-up;
+			};
+			gf_enable_suspend: gf_enable_suspend {
+				drive-strength = <10>;
+				bias-pull-up;
+			};
+		};
+
+		gf_int_gpio: gf_int_gpio {
+			label = "gf_int_gpio";
+			qcom,pins = <&gp 33>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			gf_int_active: gf_int_active {
+				drive-strength = <16>;
+				bias-disable;
+			};
+			gf_int_suspend: gf_int_suspend {
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+
+		gf_rst_gpio: gf_rst_gpio {
+			label = "gf_rst_gpio";
+			qcom,pins = <&gp 51>;
+			qcom,num-grp-pins = <1>;
+			qcom,pin-func = <0>;
+			gf_rst_active: gf_rst_active {
+				drive-strength = <10>;
+				bias-pull-up;
+			};
+			gf_rst_suspend: gf_rst_suspend {
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+		/* used for spi6 and fingerprint added by nubia */
+
+		cam_sensor_rear_default {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 129>, <&gp 107>, <&gp 31>;//ZTEMT:change by congshan 
+			qcom,num-grp-pins = <3>;
+		};
+
+		cam_sensor_rear_sleep {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 129>, <&gp 107>, <&gp 31>;//ZTEMT:change by congshan 
+			qcom,num-grp-pins = <3>;
+		};
+
+
+		cam_sensor_front_default {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 130>, <&gp 63>, <&gp 31>, <&gp 49>, <&gp 50>; //ZTEMT:change by congshan 
+			qcom,num-grp-pins = <5>;
+		};
+
+		cam_sensor_front_sleep {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 130>, <&gp 63>, <&gp 31>, <&gp 49>, <&gp 50>; //ZTEMT:change by congshan 
+			qcom,num-grp-pins = <5>;
+		};
+
+		cam_sensor_front1_default {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 131>, <&gp 66>, <&gp 31>, <&gp 49>, <&gp 50>;//ZTEMT:change by congshan 
+			qcom,num-grp-pins = <5>;
+		};
+
+		cam_sensor_front1_sleep {
+			/* RESET, STANDBY */
+			qcom,pins = <&gp 131>, <&gp 66>, <&gp 31>, <&gp 49>, <&gp 50>;//ZTEMT:change by congshan 
+			qcom,num-grp-pins = <5>;
+		};
+//ZTEMT: added by congshan starat
+		al3200_gpio_int_active {
+			qcom,pins = <&gp 142>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "al3200_gpio_int_active";
+			al3200_gpio_int_active: al3200_gpio_int_active {
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+		};
+		al3200_gpio_int_sleep {
+			qcom,pins = <&gp 142>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "al3200_gpio_int_sleep";
+			al3200_gpio_int_sleep: al3200_gpio_int_sleep {
+				drive-strength = <2>;
+			    bias-pull-down;
+			};
+		};
+		al3200_gpio_active {
+			qcom,pins = <&gp 20>, <&gp 21>, <&gp 67>, <&gp 31>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <4>;
+			label = "al3200_gpio_active";
+			al3200_gpio_active: al3200_gpio_active {
+				drive-strength = <2>;
+				bias-disable; /* No PULL */
+			};
+		};
+		al3200_gpio_sleep {
+			qcom,pins = <&gp 20>, <&gp 21>, <&gp 67>, <&gp 31>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <4>;
+			label = "al3200_gpio_sleep";
+			al3200_gpio_sleep: al3200_gpio_sleep {
+				drive-strength = <2>;
+				bias-disable; /* No PULL */
+			};
+		};
+//ZTEMT: added by congshan end
+//nubia touch screen pinctrl
+		nubia_ts_int_active {
+			qcom,pins = <&gp 65>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_int_active";
+
+			synaptics_int_active: synaptics_int_active {
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+
+		nubia_ts_int_suspend {
+			qcom,pins = <&gp 65>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_int_suspend";
+
+			synaptics_int_suspend: synaptics_int_suspend {
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+
+		nubia_ts_reset_active {
+			qcom,pins = <&gp 64>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_reset_active";
+
+			synaptics_reset_active: synaptics_reset_active {
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+
+		nubia_ts_reset_suspend {
+			qcom,pins = <&gp 64>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_reset_suspend";
+
+			synaptics_reset_suspend: synaptics_reset_suspend {
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+
+		nubia_ts_power_active {
+			qcom,pins = <&gp 69>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_power_active";
+
+			synaptics_power_active: synaptics_power_active {
+				drive-strength = <8>;
+				bias-pull-up;
+			};
+		};
+
+		nubia_ts_power_suspend {
+			qcom,pins = <&gp 69>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "nubia_ts_power_suspend";
+
+			synaptics_power_suspend: synaptics_power_suspend {
+				drive-strength = <2>;
+				bias-pull-down;
+			};
+		};
+//nubia end
+
+		tpiu_setb_10 {
+			/delete-property/ qcom,pins;
+		};
+
+		/delete-node/ pmx_rd_nfc_int;
+
+		/delete-node/ pmx_nfc_reset;
+
+		// add by nubia sensors start
+		apds9922_int {
+			qcom,pins = <&gp 140>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "apds9922-irq";
+			apds9922_default: apds9922_default{
+					drive-strength = <6>;
+					bias-pull-up;
+			};
+			apds9922_sleep: apds9922_sleep{
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+		tmd2725_int {
+			qcom,pins = <&gp 140>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "tmd2725-irq";
+			tmd2725_default: tmd2725_default{
+					drive-strength = <6>;
+					bias-pull-up;
+			};
+			tmd2725_sleep: tmd2725_sleep{
+					drive-strength = <2>;
+					bias-pull-up;
+			};
+		};
+		hall_int_0_pin {
+			qcom,pins = <&gp 144>;
+			qcom,pin-func = <0>;
+			qcom,num-grp-pins = <1>;
+			label = "hall_int_0-irq";
+			hall_int_0_default: hall_int_0_default {
+				drive-strength = <6>;
+				bias-pull-up;
+			};
+			hall_int_0_sleep: hall_int_0_sleep {
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+		//add by nubia sensors end
+		/*add by liuyunli for nfc brcm2079x*/
+                bcm2079x_int_pin{
+                        qcom,pins = <&gp 13>;
+                        //pins = "gpio13";
+                        qcom,pin-func = <0>;
+                        qcom,num-grp-pins = <1>;
+                        label = "bcm2079x_int_pin";
+
+                        bcm2079x_int_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+
+                        bcm2079x_int_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                };
+
+                bcm2079x_en_pin{
+                        qcom,pins = <&gp 12>;
+                        //pins = "gpio12";
+                        qcom,num-grp-pins = <1>;
+                        qcom,pin-func = <0>;
+                        label = "bcm2079x_en_pin";
+                        bcm2079x_en_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                        bcm2079x_en_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-disable;
+                        };
+                };
+
+                bcm2079x_ctl_pin{
+                        qcom,pins =  <&gp 34>;
+                        //pins = "gpio34";
+                        qcom,num-grp-pins = <1>;
+                        qcom,pin-func = <0>;
+                        label = "bcm2079x_ctl_pin";
+                        bcm2079x_ctl_active: active {
+                                drive-strength = <6>;
+                                bias-pull-up;
+                        };
+                        bcm2079x_ctl_suspend: suspend {
+                                drive-strength = <6>;
+                                bias-disable;
+                        };
+                };
+	};
+};
