@@ -9,3 +9,4 @@
 #include "NX569J-msm-pmi8950.dtsi"
 #include "NX569J-msm8976-regulator.dtsi"
 #include "NX569J-msm8976-camera-sensor-mtp.dtsi"
+#include "NX569J-system-mount.dtsi"
