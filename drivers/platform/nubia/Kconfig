@@ -1,0 +1,30 @@
+# Nubia configuration options
+
+config MACH_NUBIA
+    bool "NUBIA device"
+    depends on ARCH_MSM
+    help
+      Support for Nubia products
+
+config MACH_NUBIA_MSM8976
+    bool "NUBIA MSM8976"
+    depends on ARCH_MSM8916
+    select MACH_NUBIA
+    help
+      Support for MSM8976 Nubia variants
+
+menu "Nubia board selection"
+
+config MACH_NUBIA_NX591J
+    bool "NUBIA_NX591J board"
+    select MACH_NUBIA_MSM8976
+    help
+      Support for Nubia z17 lite variant
+
+config MACH_NUBIA_NX589J
+    bool "NUBIA_NX589J board"
+    select MACH_NUBIA_MSM8976
+    help
+      Support for Nubia z17 mini s variant
+
+endmenu

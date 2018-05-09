@@ -21,4 +21,4 @@
 	qcom,board-id= <8 0>;
 };
 
-#include NUBIA_OVERWRITE_DTSI_FILE
+#include "../nubia/NX591/head.dtsi"
