@@ -1,0 +1,17 @@
+&soc {
+        /delete-node/qcom,camera-flash;
+	gpio_keys {
+            /delete-node/ camera_focus;
+        };
+};
+
+&cci {
+        /delete-node/ qcom,actuator@0;
+        /delete-node/ qcom,actuator@1;
+        /delete-node/ qcom,eeprom@0;
+        /delete-node/ qcom,camera@0;
+        /delete-node/ qcom,camera@1;
+        /delete-node/ qcom,camera@2;
+        
+};
+

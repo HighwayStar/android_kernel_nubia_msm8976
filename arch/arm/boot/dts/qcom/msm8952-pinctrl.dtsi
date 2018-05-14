@@ -337,7 +337,7 @@
 			label = "cci0-active";
 			/* active state */
 			cci0_active: cci0_active {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -350,7 +350,7 @@
 			label = "cci0-suspend";
 			/*suspended state */
 			cci0_suspend: cci0_suspend {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -363,7 +363,7 @@
 			label = "cci1-active";
 			/* active state */
 			cci1_active: cci1_active {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -376,7 +376,7 @@
 			label = "cci1-suspend";
 			/*suspended state */
 			cci1_suspend: cci1_suspend {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};

@@ -414,7 +414,7 @@
 			label = "cci0-active";
 			/* active state */
 			cci0_active: cci0_active {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -427,7 +427,7 @@
 			label = "cci0-suspend";
 			/*suspended state */
 			cci0_suspend: cci0_suspend {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -440,7 +440,7 @@
 			label = "cci1-active";
 			/* active state */
 			cci1_active: cci1_active {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -453,7 +453,7 @@
 			label = "cci1-suspend";
 			/*suspended state */
 			cci1_suspend: cci1_suspend {
-				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+				drive-strength = <2>; /* 2 MA */
 				bias-disable; /* No PULL */
 			};
 		};
@@ -570,7 +570,7 @@
 
 		cam_sensor_rear_sleep {
 			/* RESET, STANDBY */
-			qcom,pins = <&gp 129>,<&gp 35>;
+			qcom,pins = <&gp 129>, <&gp 35>;
 			qcom,num-grp-pins = <2>;
 			label = "cam_sensor_rear_sleep";
 			/*suspended state */
@@ -631,7 +631,7 @@
 
 		cam_sensor_front_default {
 			/* RESET, STANDBY */
-			qcom,pins = <&gp 130>, <&gp 36>; 
+			qcom,pins = <&gp 130>, <&gp 36>;
 			qcom,num-grp-pins = <2>;
 			label = "cam_sensor_front_default";
 			/* active state */
@@ -643,7 +643,7 @@
 
 		cam_sensor_front_sleep {
 			/* RESET, STANDBY */
-			qcom,pins = <&gp 130>, <&gp 36>; 
+			qcom,pins = <&gp 130>, <&gp 36>;
 			qcom,num-grp-pins = <2>;
 			label = "cam_sensor_front_sleep";
 			/*suspended state */
@@ -788,9 +788,9 @@
 		};
 
 		tlmm_gpio_key: tlmm_gpio_key {
-			qcom,pins = <&gp 113>, <&gp 114>/*, <&gp 115>*/;
+			qcom,pins = <&gp 113>, <&gp 114>, <&gp 115>;
 			qcom,pin-func = <0>;
-			qcom,num-grp-pins = <2>;
+			qcom,num-grp-pins = <3>;
 			label = "tlmm_gpio_key";
 
 			gpio_key_active: gpio_key_active {

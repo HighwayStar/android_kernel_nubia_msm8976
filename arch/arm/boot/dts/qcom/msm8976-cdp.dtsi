@@ -106,7 +106,7 @@
 		pinctrl-names = "tlmm_gpio_key_active","tlmm_gpio_key_suspend";
 		pinctrl-0 = <&gpio_key_active>;
 		pinctrl-1 = <&gpio_key_suspend>;
-/*
+
 		camera_focus {
 			label = "camera_focus";
 			gpios = <&msm_gpio 115 0x1>;
@@ -114,7 +114,7 @@
 			linux,code = <0x210>;
 			debounce-interval = <15>;
 		};
-*/
+
 		camera_snapshot {
 			label = "camera_snapshot";
 			gpios = <&msm_gpio 114 0x1>;
@@ -164,8 +164,8 @@
 
 &tlmm_pinmux {
 	tlmm_gpio_key {
-		qcom,pins = <&gp 112>, <&gp 113>, <&gp 114>/*, <&gp 115>*/;
-		qcom,num-grp-pins = <3>;
+		qcom,pins = <&gp 112>, <&gp 113>, <&gp 114>, <&gp 115>;
+		qcom,num-grp-pins = <4>;
 	};
 };
 

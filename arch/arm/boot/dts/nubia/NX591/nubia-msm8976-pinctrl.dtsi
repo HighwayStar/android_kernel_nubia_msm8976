@@ -1,0 +1,48 @@
+/*
+ * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&soc {
+	tlmm_pinmux: pinctrl@1000000 {
+
+		/* cci */
+		cci0_active {
+			cci0_active: cci0_active {
+				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+			};
+		};
+
+		cci0_suspend {
+			cci0_suspend: cci0_suspend {
+				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+			};
+		};
+
+		cci1_active {
+			cci1_active: cci1_active {
+				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+			};
+		};
+
+		cci1_suspend {
+			cci1_suspend: cci1_suspend {
+				drive-strength = <4>; /* ZTEMT: guxiaodong modify 2 MA to 4 MA */
+			};
+		};
+
+		tlmm_gpio_key: tlmm_gpio_key {
+			qcom,pins = <&gp 113>, <&gp 114>/*, <&gp 115>*/; //ZTEMT
+			qcom,num-grp-pins = <2>; //ZTEMT
+		};
+
+	};
+};

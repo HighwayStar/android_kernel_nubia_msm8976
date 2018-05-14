@@ -12,7 +12,7 @@
  */
 
 #include "msm8976-pinctrl.dtsi"
-//#include "msm8976-camera-sensor-mtp.dtsi"/*ZTEMT delete it for nubia camera*/
+#include "msm8976-camera-sensor-mtp.dtsi"
 #include "msm8976-mdss-mtp.dtsi"
 #include "msm8976-wsa881x.dtsi"
 
@@ -88,7 +88,7 @@
 		pinctrl-names = "tlmm_gpio_key_active","tlmm_gpio_key_suspend";
 		pinctrl-0 = <&gpio_key_active>;
 		pinctrl-1 = <&gpio_key_suspend>;
-/*
+
 		camera_focus {
 			label = "camera_focus";
 			gpios = <&msm_gpio 115 0x1>;
@@ -96,7 +96,7 @@
 			linux,code = <0x210>;
 			debounce-interval = <15>;
 		};
-*/
+
 		camera_snapshot {
 			label = "camera_snapshot";
 			gpios = <&msm_gpio 114 0x1>;
@@ -215,10 +215,10 @@
 	#interrupt-cells = <1>;
 	interrupt-map-mask = <0xffffffff>;
 	interrupt-map = <0 &intc 0 125 0
-			1 &intc 0 221 0>;
-			//2 &msm_gpio 100 0>;//ZTEMT: guxiaodong modify for s5k3p8sp
+			1 &intc 0 221 0
+			2 &msm_gpio 100 0>;
 	interrupt-names = "hc_irq", "pwr_irq", "status_irq";
-	//cd-gpios = <&msm_gpio 100 0x1>;//ZTEMT: guxiaodong modify for s5k3p8sp
+	cd-gpios = <&msm_gpio 100 0x1>;
 
 	status = "ok";
 };
@@ -245,42 +245,17 @@
 /{
 	mtp_batterydata: qcom,battery-data {
 		qcom,batt-id-range-pct = <15>;
-                #include "batterydata-scud-4v4-3000mah.dtsi"
-		#include "batterydata-atl-4v4-3000mah.dtsi"
-		#include "batterydata-lg-4v4-3000mah.dtsi"
+		#include "batterydata-itech-3000mah-4200mv.dtsi"
+		#include "batterydata-itech-3000mah.dtsi"
 	};
 };
 
 &pmi8950_fg {
 	qcom,battery-data = <&mtp_batterydata>;
-        qcom,resume-soc = <99>; 
-        qcom,fg-cutoff-voltage-mv = <3300>;  
-        qcom,fg-iterm-ma = <200>;  
-        qcom,fg-chg-iterm-ma = <150>;
-
-        qcom,cold-bat-decidegc = <(-10)>;
-        qcom,cool-bat-decidegc = <100>;
-        qcom,warm-bat-decidegc = <430>;
-        qcom,hot-bat-decidegc = <500>;
-        qcom,cold-hot-jeita-hysteresis = <20 20>;//add for jeita hysteresis
-
-        qcom,irq-volt-empty-mv = <3100>;
-        qcom,vbat-estimate-diff-mv = <200>;
-
-        qcom,thermal-coefficients = [EC 85 75 4A FC 35];
-        qcom,hold-soc-while-full;
-	nubia,use-default-batt-type = "scud_3200mah";
-        qcom,ext-sense-type;
 };
 
 &pmi8950_charger {
 	qcom,battery-data = <&mtp_batterydata>;
-        qcom,float-voltage-mv = <4400>;  
-        qcom,resume-delta-mv = <50>;    
-
-        qcom,charging-timeout-mins = <768>;
-        qcom,fastchg-current-ma = <1800>;
-        qcom,fastchg-current-comp = <250>; //add jeita control charge current
 	qcom,chg-led-support;
 	qcom,chg-led-sw-controls;
 };
