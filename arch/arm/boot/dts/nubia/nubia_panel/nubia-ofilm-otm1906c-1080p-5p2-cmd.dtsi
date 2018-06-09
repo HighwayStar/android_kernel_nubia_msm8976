@@ -358,8 +358,8 @@
 
        39 01 00 00 00 00 02 35 00
 
-       39 01 00 00 00 00 02 51 FF
-       39 01 00 00 00 00 02 53 24
+       39 01 00 00 00 00 02 51 00
+       39 01 00 00 00 00 02 53 2C
        39 01 00 00 78 00 02 11 00
        39 01 00 00 00 00 02 29 00
 
@@ -421,7 +421,7 @@
 		nubia,colortmp-adjustable-red = <0x3f>;
 
 		//cabc
-		nubia,mdss-dsi-cabc-low-bl = <0x640>;
+		nubia,mdss-dsi-cabc-low-bl = <0x64>;
 		nubia,mdss-dsi-cabc-command-off = [
        39 01 00 00 00 00 02 00 00
        39 01 00 00 00 00 03 99 95 27
@@ -511,9 +511,8 @@
 		qcom,mdss-dsi-dma-trigger = "trigger_sw";
 		qcom,mdss-dsi-mdp-trigger = "none";
 		qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
-		qcom,mdss-dsi-bl-min-level = <2>;
-		qcom,mdss-dsi-bl-max-level = <4095>;
-		qcom,mdss-brightness-max-level = <4095>;
+		qcom,mdss-dsi-bl-min-level = <1>;
+		qcom,mdss-dsi-bl-max-level = <255>;
 		qcom,mdss-dsi-reset-sequence = <1 10>, <0 5>, <1 10>;
 		qcom,mdss-pan-physical-width-dimension = <65>;
 		qcom,mdss-pan-physical-height-dimension = <115>;
