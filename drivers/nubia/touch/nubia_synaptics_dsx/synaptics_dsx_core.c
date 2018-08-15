@@ -78,6 +78,10 @@
 #define REPORT_2D_Z
 #define REPORT_2D_W
 
+#define MINXTOUCH 30
+#define MAXXTOUCH 1040
+#define LIMITTOUCH 1
+
 //#define REPORT_2D_PRESSURE
 
 
@@ -1639,6 +1643,10 @@ static int synaptics_rmi4_f12_abs_report(struct synaptics_rmi4_data *rmi4_data,
 					MT_TOOL_FINGER, 1);
 #endif
 
+#ifdef LIMITTOUCH
+			if ((x > 0) && ((x < MINXTOUCH) || (x > MAXXTOUCH)))
+				break;
+#endif
 			input_report_key(rmi4_data->input_dev,
 					BTN_TOUCH, 1);
 			input_report_key(rmi4_data->input_dev,
