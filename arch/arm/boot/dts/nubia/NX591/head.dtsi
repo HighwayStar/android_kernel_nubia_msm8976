@@ -5,7 +5,7 @@
 #include "sample.dtsi"
 #include "others.dtsi"
 #include "audio.dtsi"
-#include "drop-qcom-camera.dtsi"
+#include "../common/drop-qcom-camera.dtsi"
 #include "camera.dtsi"
 #include "camera-pinctrl.dtsi"
 #include "nfc.dtsi"
@@ -15,63 +15,7 @@
 #include "touch.dtsi"
 #include "finger.dtsi"
 #include "sensors.dtsi"
-#include "nubia-msm8976-pm.dtsi"
-#include "nubia-msm8976-pinctrl.dtsi"
-&rpm_bus {
-	rpm-regulator-ldoa10 {
-		pm8950_l10: regulator-l10 {
-			regulator-min-microvolt = <2500000>;
-			regulator-max-microvolt = <3600000>;
-			qcom,init-voltage = <2850000>;
-		};
-	};
-};
-
-
-&sdhc_2 {
-    interrupt-map = <0 &intc 0 125 0
-                        1 &intc 0 221 0>; //ZTEMT: guxiaodong modify for s5k3p8sp
-    /delete-property/ cd-gpios; //ZTEMT: guxiaodong modify for s5k3p8sp
-};
-
-/{
-	mtp_batterydata: qcom,battery-data {
-		#include "batterydata-scud-4v4-3000mah.dtsi"
-		#include "batterydata-atl-4v4-3000mah.dtsi"
-		#include "batterydata-lg-4v4-3000mah.dtsi"
-	};
-};
-
-
-&pmi8950_fg {
-	qcom,resume-soc = <99>; 
-	qcom,fg-cutoff-voltage-mv = <3300>;  
-	qcom,fg-iterm-ma = <200>;  
-	qcom,fg-chg-iterm-ma = <150>;
-	qcom,cold-bat-decidegc = <(-10)>;
-	qcom,cool-bat-decidegc = <100>;
-	qcom,warm-bat-decidegc = <430>;
-	qcom,hot-bat-decidegc = <500>;
-	qcom,cold-hot-jeita-hysteresis = <20 20>;//add for jeita hysteresis
-	qcom,irq-volt-empty-mv = <3100>;
-	qcom,vbat-estimate-diff-mv = <200>;
-	qcom,thermal-coefficients = [EC 85 75 4A FC 35];
-	qcom,hold-soc-while-full;
-	nubia,use-default-batt-type = "scud_3200mah";
-	qcom,ext-sense-type;
-};
- 
-&pmi8950_charger {
-	qcom,float-voltage-mv = <4400>;  
-	qcom,resume-delta-mv = <50>;    
-	qcom,charging-timeout-mins = <768>;
-	qcom,fastchg-current-ma = <1800>;
-	qcom,fastchg-current-comp = <250>; //add jeita control charge current
-};
-
-&soc {
-        dsi_panel_pwr_supply: dsi_panel_pwr_supply {
-                /delete-node/ qcom,panel-supply-entry@3;
-        };
-};
+#include "../common/nubia-msm8976-pm.dtsi"
+#include "../common/nubia-msm8976-pinctrl.dtsi"
+#include "../common/misc.dtsi"
 

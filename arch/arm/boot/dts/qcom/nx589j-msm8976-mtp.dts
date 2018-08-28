@@ -20,3 +20,5 @@
 	compatible = "qcom,msm8976-mtp", "qcom,msm8976", "qcom,mtp";
 	qcom,board-id= <8 0>;
 };
+
+#include "../nubia/NX589/head.dtsi"
